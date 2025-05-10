@@ -1,3 +1,5 @@
+// backend/controllers/vendedoresController.js
+
 const { vendedor } = require('../models');
 
 exports.solicitarVendedor = async (req, res) => {

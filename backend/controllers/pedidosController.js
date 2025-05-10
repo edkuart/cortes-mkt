@@ -1,8 +1,8 @@
 // backend/controllers/pedidosController.js
 
-const { Pedido, DetallePedido, Producto } = require('../models');
+const { Pedido, DetallePedido, Producto, Entrega } = require('../models');
 
-// 🔍 Obtener todos los pedidos sin filtrar (temporal para depurar)
+// 🔍 Obtener todos los pedidos sin filtrar (incluyendo entrega y estado en texto)
 const obtenerTodosLosPedidos = async (req, res) => {
   try {
     const pedidos = await Pedido.findAll({
@@ -12,11 +12,35 @@ const obtenerTodosLosPedidos = async (req, res) => {
           as: "detalles",
           include: [Producto],
         },
+        {
+          model: Entrega
+        }
       ],
       order: [['createdAt', 'DESC']],
     });
 
-    res.json(pedidos);
+    const pedidosConEstado = pedidos.map((pedido) => {
+      const detalles = pedido.detalles || [];
+      const total = detalles.reduce((acc, detalle) => {
+        if (!detalle.producto) return acc;
+        return acc + detalle.cantidad * detalle.producto.precio;
+      }, 0);
+
+      let estadoTexto = 'Pendiente';
+      let mostrarBotonConfirmar = false;
+      if (pedido.entrega) {
+        const { confirmacionCliente, confirmacionRepartidor } = pedido.entrega;
+        if (confirmacionCliente && confirmacionRepartidor) estadoTexto = 'Entregado';
+        else if (confirmacionRepartidor) estadoTexto = 'En camino';
+        else estadoTexto = 'Preparando envío';
+
+        mostrarBotonConfirmar = !confirmacionCliente;
+      }
+
+      return { ...pedido.toJSON(), total, estadoTexto, mostrarBotonConfirmar };
+    });
+
+    res.json(pedidosConEstado);
   } catch (error) {
     console.error("🔴 Error al obtener todos los pedidos:", error);
     res.status(500).json({ mensaje: "Error al obtener los pedidos" });
@@ -57,7 +81,7 @@ const crearPedido = async (req, res) => {
   }
 };
 
-// Obtener todos los pedidos de un usuario con alias y total
+// Obtener todos los pedidos de un usuario con alias y total (incluyendo entrega y estado en texto)
 const obtenerPedidosPorUsuario = async (req, res) => {
   console.log("🟡 Entrando a obtenerPedidosPorUsuario para el ID:", req.params.id);
   try {
@@ -69,20 +93,35 @@ const obtenerPedidosPorUsuario = async (req, res) => {
           as: "detalles",
           include: [Producto],
         },
+        {
+          model: Entrega
+        }
       ],
       order: [['createdAt', 'DESC']],
     });
 
-    const pedidosConTotal = pedidos.map((pedido) => {
+    const pedidosConEstado = pedidos.map((pedido) => {
       const detalles = pedido.detalles || [];
       const total = detalles.reduce((acc, detalle) => {
         if (!detalle.producto) return acc;
         return acc + detalle.cantidad * detalle.producto.precio;
       }, 0);
-      return { ...pedido.toJSON(), total };
+
+      let estadoTexto = 'Pendiente';
+      let mostrarBotonConfirmar = false;
+      if (pedido.entrega) {
+        const { confirmacionCliente, confirmacionRepartidor } = pedido.entrega;
+        if (confirmacionCliente && confirmacionRepartidor) estadoTexto = 'Entregado';
+        else if (confirmacionRepartidor) estadoTexto = 'En camino';
+        else estadoTexto = 'Preparando envío';
+
+        mostrarBotonConfirmar = !confirmacionCliente;
+      }
+
+      return { ...pedido.toJSON(), total, estadoTexto, mostrarBotonConfirmar };
     });
 
-    res.json(pedidosConTotal);
+    res.json(pedidosConEstado);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error al obtener pedidos del usuario' });
@@ -114,4 +153,6 @@ module.exports = {
   cambiarEstadoPedido,
   obtenerTodosLosPedidos,
 };
+
+
 

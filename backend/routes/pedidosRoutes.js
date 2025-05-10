@@ -13,5 +13,8 @@ router.get('/usuario/:id', pedidosController.obtenerPedidosPorUsuario);
 // Cambiar estado del pedido
 router.put('/:id/estado', pedidosController.cambiarEstadoPedido);
 
+router.get('/', pedidosController.obtenerTodosLosPedidos);
+
+
 module.exports = router;
 

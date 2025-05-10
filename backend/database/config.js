@@ -1,3 +1,5 @@
+// backend/database/config.js
+
 const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize({

@@ -1,3 +1,5 @@
+// backend/middleware/authMiddleware.js
+
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET || 'clave_secreta';
 
