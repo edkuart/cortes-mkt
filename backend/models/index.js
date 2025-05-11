@@ -17,6 +17,7 @@ const InteraccionIAModel = require('./interaccionIA.model');
 const EntregaModel = require('./entrega.model');
 const VendedorModel = require('./vendedor.model');
 const DetallePedidoModel = require('./detallePedido.model');
+const DevolucionModel = require('./devolucion'); // ✅ Importar el modelo de devolución
 
 // Inicializar modelos
 const Pedido = PedidoModel(sequelize, DataTypes);
@@ -27,6 +28,7 @@ const InteraccionIA = InteraccionIAModel(sequelize, DataTypes);
 const Entrega = EntregaModel(sequelize, DataTypes);
 const Vendedor = VendedorModel(sequelize, DataTypes);
 const DetallePedido = DetallePedidoModel(sequelize, DataTypes);
+const Devolucion = DevolucionModel(sequelize, DataTypes); // ✅ Inicializar el modelo
 
 // Relaciones
 if (Usuario && Resena) {
@@ -46,6 +48,10 @@ DetallePedido.belongsTo(Producto, { foreignKey: 'productoId' });
 DetallePedido.belongsTo(Pedido, { foreignKey: 'pedidoId' });
 Pedido.hasMany(DetallePedido, { foreignKey: 'pedidoId', as: 'detalles' });
 
+// Relación con devoluciones
+Devolucion.belongsTo(Pedido, { foreignKey: 'pedidoId' });
+Pedido.hasMany(Devolucion, { foreignKey: 'pedidoId' });
+
 // Exportar
 module.exports = {
   sequelize,
@@ -57,4 +63,5 @@ module.exports = {
   Entrega,
   Vendedor,
   DetallePedido,
+  Devolucion, // ✅ Exportar el modelo
 };

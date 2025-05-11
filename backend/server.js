@@ -10,6 +10,25 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Luego ya tus rutas:
+const devolucionesRoutes = require('./routes/devolucionesRoutes');
+app.use('/api/devoluciones', devolucionesRoutes);
+
+app.get('/debug/crear-pedido', async (req, res) => {
+  const { Pedido } = require('./models');
+
+  const nuevo = await Pedido.create({
+    compradorId: 1,
+    total: 100,
+    estado: 'pendiente',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  res.json(nuevo);
+});
+
+
 // Importar rutas
 const usuariosRoutes = require('./routes/usuariosRoutes');
 const pedidosRoutes = require('./routes/pedidosRoutes');
@@ -33,6 +52,15 @@ app.use('/api/ia', aiRoutes);
 app.get('/', (req, res) => {
   res.send('🚀 Bienvenido al Marketplace Modular Backend');
 });
+
+app.get('/debug/pedidos', async (req, res) => {
+  const { Pedido } = require('./models');
+  const pedidos = await Pedido.findAll();
+  res.json(pedidos);
+});
+
+const notificacionesRoutes = require('./routes/notificacionesRoutes');
+app.use('/api/notificaciones', notificacionesRoutes);
 
 // Puerto y sincronización de base de datos
 const PORT = process.env.PORT || 4000;
@@ -60,26 +88,3 @@ sequelize.sync({ alter: true })
   .catch((error) => {
     console.error("🔴 Error al sincronizar la base de datos:", error);
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

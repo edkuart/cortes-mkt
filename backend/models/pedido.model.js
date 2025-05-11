@@ -19,6 +19,11 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
   });
 
+  // 🧩 Relación con devoluciones
+  Pedido.associate = (models) => {
+    Pedido.hasMany(models.Devolucion, { foreignKey: 'pedidoId' });
+  };
+
   return Pedido;
 };
 
