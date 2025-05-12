@@ -28,6 +28,20 @@ app.get('/debug/crear-pedido', async (req, res) => {
   res.json(nuevo);
 });
 
+app.get('/debug/crear-usuario', async (req, res) => {
+  const { Usuario } = require('./models');
+  const bcrypt = require('bcryptjs');
+
+  const hash = await bcrypt.hash('123456', 10);
+  const nuevo = await Usuario.create({
+    nombreCompleto: 'Preda Welch',
+    correo: 'test@correo.com',
+    contraseña: hash,
+    rol: 'vendedor'
+  });
+
+  res.json(nuevo);
+});
 
 // Importar rutas
 const usuariosRoutes = require('./routes/usuariosRoutes');
@@ -69,7 +83,7 @@ const { sequelize } = require('./models');
 sequelize.sync({ alter: true })
   .then(() => {
     console.log("🟢 Base de datos sincronizada correctamente");
-    const server = app.listen(PORT, () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 
       try {

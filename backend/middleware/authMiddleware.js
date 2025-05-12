@@ -4,7 +4,9 @@ const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET || 'clave_secreta';
 
 exports.verificarToken = (req, res, next) => {
-  const token = req.headers['authorization'];
+  const authHeader = req.headers['authorization'];
+  const token = authHeader?.split(' ')[1];
+
   if (!token) return res.status(403).json({ mensaje: 'Token requerido.' });
 
   try {
@@ -22,3 +24,4 @@ exports.soloAdmin = (req, res, next) => {
   }
   next();
 };
+

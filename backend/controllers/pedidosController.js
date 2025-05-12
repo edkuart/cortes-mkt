@@ -128,6 +128,33 @@ const obtenerPedidosPorUsuario = async (req, res) => {
   }
 };
 
+// Obtener pedidos del vendedor autenticado
+const obtenerPedidosPorVendedor = async (req, res) => {
+  try {
+    const vendedorId = req.usuario.id;
+
+    const pedidos = await Pedido.findAll({
+      where: { vendedorId },
+      include: [
+        {
+          model: DetallePedido,
+          as: "detalles",
+          include: [Producto],
+        },
+        {
+          model: Entrega
+        }
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+
+    res.json(pedidos);
+  } catch (error) {
+    console.error('Error al obtener pedidos del vendedor:', error);
+    res.status(500).json({ mensaje: 'Error al obtener pedidos del vendedor.' });
+  }
+};
+
 // Cambiar estado del pedido
 const cambiarEstadoPedido = async (req, res) => {
   try {
@@ -152,7 +179,9 @@ module.exports = {
   obtenerPedidosPorUsuario,
   cambiarEstadoPedido,
   obtenerTodosLosPedidos,
+  obtenerPedidosPorVendedor,
 };
+
 
 
 
