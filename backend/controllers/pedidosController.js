@@ -47,6 +47,46 @@ const obtenerTodosLosPedidos = async (req, res) => {
   }
 };
 
+// Obtener pedido por ID
+const obtenerPedidoPorId = async (req, res) => {
+  try {
+    const pedido = await Pedido.findByPk(req.params.id, {
+      include: [
+        {
+          model: DetallePedido,
+          as: 'detalles',
+          include: [Producto]
+        },
+        {
+          model: Entrega
+        }
+      ]
+    });
+
+    if (!pedido) {
+      return res.status(404).json({ mensaje: 'Pedido no encontrado' });
+    }
+
+    const total = pedido.detalles.reduce((acc, d) => {
+      return acc + (d.cantidad * d.producto?.precio || 0);
+    }, 0);
+
+    let estadoTexto = 'Pendiente';
+    if (pedido.entrega) {
+      const { confirmacionCliente, confirmacionRepartidor } = pedido.entrega;
+      if (confirmacionCliente && confirmacionRepartidor) estadoTexto = 'Entregado';
+      else if (confirmacionRepartidor) estadoTexto = 'En camino';
+      else estadoTexto = 'Preparando envío';
+    }
+
+    res.json({ ...pedido.toJSON(), total, estadoTexto });
+  } catch (error) {
+    console.error('Error al obtener pedido por ID:', error);
+    res.status(500).json({ mensaje: 'Error al obtener el pedido' });
+  }
+};
+
+
 // Crear nuevo pedido
 const crearPedido = async (req, res) => {
   try {
@@ -180,6 +220,7 @@ module.exports = {
   cambiarEstadoPedido,
   obtenerTodosLosPedidos,
   obtenerPedidosPorVendedor,
+  obtenerPedidoPorId,
 };
 
 

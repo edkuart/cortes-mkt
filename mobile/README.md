@@ -1,50 +1,110 @@
-# Welcome to your Expo app 👋
+# 📱 Marketplace Modular - App Móvil
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Esta es la aplicación **móvil oficial** del proyecto Marketplace Modular. Está construida con **React Native + Expo**, y conecta directamente con el backend del marketplace. Permite iniciar sesión, ver pedidos, gestionar devoluciones y más funcionalidades para compradores y vendedores.
 
-## Get started
+---
 
-1. Install dependencies
+## 🚀 Tecnologías Utilizadas
 
-   ```bash
-   npm install
-   ```
+- React Native (Expo)
+- React Navigation
+- AsyncStorage
+- Day.js (fechas)
+- Context API (autenticación)
+- Fetch + manejo de token JWT
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## 📁 Estructura del Proyecto
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+mobile/
+├── App.js
+├── app.json
+├── package.json
+├── .env
+├── components/
+├── contexts/
+│   └── AuthContext.js
+├── navigation/
+│   └── AppNavigator.js
+├── screens/
+│   ├── LoginScreen.js
+│   ├── RegistroScreen.js
+│   ├── DashboardVendedor.js
+│   ├── MisPedidos.js
+│   ├── DevolucionesScreen.js
+│   └── DetallePedidoScreen.js
+├── services/
+│   └── api.js
+└── assets/
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## ⚙️ Configuración Inicial
 
-To learn more about developing your project with Expo, look at the following resources:
+1. Instalar dependencias:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm install
+```
 
-## Join the community
+2. Crear archivo `.env`:
 
-Join our community of developers creating universal apps.
+```env
+API_URL=http://192.168.1.173:4000
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+> ⚠️ Reemplazá la IP por la IP de tu servidor si estás en red local.
+
+3. Iniciar la app:
+
+```bash
+npx expo start --clear
+```
+
+4. Escaneá el QR con Expo Go desde tu celular.
+
+---
+
+## ✅ Funcionalidades Actuales
+
+- Autenticación con JWT
+- Restauración de sesión desde AsyncStorage
+- Redirección automática al dashboard según el rol
+- Vista de pedidos del vendedor (token protegido)
+- Vista de devoluciones con botones para aceptar/rechazar
+- Vista de detalle del pedido con productos, totales y estado
+- Logout y limpieza de sesión
+
+---
+
+## 🔐 API protegida
+
+Las peticiones autenticadas (por ejemplo `/api/pedidos/vendedor`, `/api/devoluciones`) usan automáticamente el token JWT almacenado en el dispositivo.
+
+---
+
+## ⬆️ Próximas Funciones (sugeridas)
+
+- Menú lateral con navegación entre módulos
+- Reseñas del vendedor
+- Exportación PDF (resumen del mes)
+- Notificaciones push con Firebase
+
+---
+
+## 📝 Commit Sugerido
+
+```bash
+git add mobile/
+git commit -m "🧾 Detalle de pedido móvil con navegación desde el dashboard"
+```
+
+---
+
+## 📬 Contacto
+
+Para dudas o soporte: [edkuart@gmail.com](mailto:edkuart@gmail.com)
+

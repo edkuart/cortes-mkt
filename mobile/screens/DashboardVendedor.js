@@ -1,15 +1,17 @@
 // 📂 screens/DashboardVendedor.js
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet, Button } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet, Button, TouchableOpacity } from 'react-native';
 import { apiFetch } from '../services/api';
 import dayjs from 'dayjs';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../contexts/AuthContext';
 
 const DashboardVendedor = () => {
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const navigation = useNavigation();
+  const { logout } = useAuth();
 
   useEffect(() => {
     const obtenerPedidos = async () => {
@@ -33,7 +35,8 @@ const DashboardVendedor = () => {
   if (pedidos.length === 0) {
     return (
       <View style={styles.container}>
-        <Button title="Ver Devoluciones" onPress={() => navigation.navigate('Devoluciones')} />
+        <Button title="Ver Devoluciones" onPress={() => navigation.navigate('ProductoDetalle', { pedidoId: item.id })} />
+        <Button title="Cerrar sesión" onPress={logout} color="#dc3545" />
         <Text style={styles.empty}>No hay pedidos disponibles.</Text>
       </View>
     );
@@ -42,16 +45,19 @@ const DashboardVendedor = () => {
   return (
     <View style={styles.container}>
       <Button title="Ver Devoluciones" onPress={() => navigation.navigate('Devoluciones')} />
+      <Button title="Cerrar sesión" onPress={logout} color="#dc3545" />
       <FlatList
         data={pedidos}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.titulo}>Pedido #{item.id}</Text>
-            <Text>Total: Q{item.total?.toFixed(2)}</Text>
-            <Text>Estado: {item.estadoTexto || 'pendiente'}</Text>
-            <Text>Fecha: {dayjs(item.createdAt).format('DD/MM/YYYY')}</Text>
-          </View>
+          <TouchableOpacity onPress={() => navigation.navigate('ProductoDetalle', { pedidoId: item.id })}>
+            <View style={styles.card}>
+              <Text style={styles.titulo}>Pedido #{item.id}</Text>
+              <Text>Total: Q{item.total?.toFixed(2)}</Text>
+              <Text>Estado: {item.estadoTexto || 'pendiente'}</Text>
+              <Text>Fecha: {dayjs(item.createdAt).format('DD/MM/YYYY')}</Text>
+            </View>
+          </TouchableOpacity>
         )}
       />
     </View>
@@ -71,3 +77,4 @@ const styles = StyleSheet.create({
 });
 
 export default DashboardVendedor;
+

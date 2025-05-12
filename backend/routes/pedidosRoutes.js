@@ -8,6 +8,8 @@ const { verificarToken } = require('../middleware/authMiddleware');
 // Crear pedido
 router.post('/', pedidosController.crearPedido);
 
+router.get('/:id', pedidosController.obtenerPedidoPorId);
+
 // Obtener pedidos por comprador
 router.get('/usuario/:id', pedidosController.obtenerPedidosPorUsuario);
 
