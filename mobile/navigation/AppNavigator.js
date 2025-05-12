@@ -10,12 +10,12 @@ import MisPedidos from '../screens/MisPedidos';
 import ProductoDetalle from '../screens/ProductoDetalle';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
-
-const Stack = createNativeStackNavigator();
+import DevolucionesScreen from '../screens/DevolucionesScreen';
 
 const AppNavigator = () => {
   const { usuario } = useAuth();
   const navigation = useNavigation();
+  const Stack = createNativeStackNavigator();
 
   useEffect(() => {
     if (usuario?.rol === 'vendedor') {
@@ -45,6 +45,8 @@ const AppNavigator = () => {
             )}
             <Stack.Screen name="MisPedidos" component={MisPedidos} />
             <Stack.Screen name="ProductoDetalle" component={ProductoDetalle} />
+            <Stack.Screen name="Devoluciones" component={DevolucionesScreen} />
+
           </>
         )}
       </Stack.Navigator>
