@@ -21,11 +21,15 @@ const obtenerTodosLosPedidos = async (req, res) => {
 
     const pedidosConEstado = pedidos.map((pedido) => {
       const detalles = pedido.detalles || [];
+    
       const total = detalles.reduce((acc, detalle) => {
         if (!detalle.producto) return acc;
         return acc + detalle.cantidad * detalle.producto.precio;
       }, 0);
-
+    
+      const primerProducto = detalles[0]?.producto;
+      const vendedorId = primerProducto?.vendedorId || null;
+    
       let estadoTexto = 'Pendiente';
       let mostrarBotonConfirmar = false;
       if (pedido.entrega) {
@@ -33,12 +37,18 @@ const obtenerTodosLosPedidos = async (req, res) => {
         if (confirmacionCliente && confirmacionRepartidor) estadoTexto = 'Entregado';
         else if (confirmacionRepartidor) estadoTexto = 'En camino';
         else estadoTexto = 'Preparando envío';
-
+    
         mostrarBotonConfirmar = !confirmacionCliente;
       }
-
-      return { ...pedido.toJSON(), total, estadoTexto, mostrarBotonConfirmar };
-    });
+    
+      return {
+        ...pedido.toJSON(),
+        total,
+        estadoTexto,
+        mostrarBotonConfirmar,
+        vendedorId
+      };
+    });    
 
     res.json(pedidosConEstado);
   } catch (error) {

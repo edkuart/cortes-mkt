@@ -30,9 +30,12 @@ const Vendedor = VendedorModel(sequelize, DataTypes);
 const DetallePedido = DetallePedidoModel(sequelize, DataTypes);
 const Devolucion = DevolucionModel(sequelize, DataTypes); // ✅ Inicializar el modelo
 
+console.log("🗂 Base de datos usada:", sequelize.options.storage);
+
 // Relaciones
 if (Usuario && Resena) {
   Resena.belongsTo(Usuario, { as: 'Comprador', foreignKey: 'compradorId' });
+  Resena.belongsTo(Usuario, { as: 'Vendedor', foreignKey: 'vendedorId' });
 }
 
 Producto.belongsTo(Vendedor, { foreignKey: 'vendedorId' });

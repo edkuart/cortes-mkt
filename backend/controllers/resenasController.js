@@ -1,53 +1,88 @@
-// backend/controllers/resenasController.js
+// 📁 backend/controllers/resenasController.js
 
 const { Resena, Usuario } = require('../models');
 
-// Crear una nueva reseña
-const crearReseña = async (req, res) => {
+// Obtener reseñas de un comprador específico
+const obtenerResenasPorComprador = async (req, res) => {
   try {
-    const { vendedorId, compradorId, comentario, calificacion } = req.body;
+    const { id } = req.params;
+
+    const resenas = await Resena.findAll({
+      where: { compradorId: id },
+      include: [{ model: Usuario, as: 'Vendedor', attributes: ['id', 'nombreCompleto'] }]
+    });
+
+    res.json(resenas);
+  } catch (error) {
+    console.error('Error al obtener reseñas del comprador:', error);
+    res.status(500).json({ mensaje: 'Error al obtener reseñas' });
+  }
+};
+
+// Crear una nueva resena
+const crearResena = async (req, res) => {
+  try {
+    const { vendedorId, comentario, calificacion, pedidoId } = req.body;
+    const compradorId = req.usuario.id;
+
+    if (!pedidoId) {
+      return res.status(400).json({ mensaje: 'Se requiere el ID del pedido.' });
+    }
 
     if (calificacion < 1 || calificacion > 5) {
-      return res.status(400).json({ mensaje: 'La calificación debe ser entre 1 y 5' });
+      return res.status(400).json({ mensaje: 'La calificacion debe estar entre 1 y 5.' });
+    }
+
+    // Validar que no exista ya una resena para ese pedido y comprador
+    const yaExiste = await Resena.findOne({
+      where: {
+        vendedorId,
+        compradorId,
+        pedidoId
+      }
+    });
+
+    if (yaExiste) {
+      return res.status(400).json({ mensaje: 'Ya dejaste una resena para este pedido.' });
     }
 
     const resena = await Resena.create({
       vendedorId,
       compradorId,
       comentario,
-      calificacion
+      calificacion,
+      pedidoId
     });
 
-    res.status(201).json({ mensaje: 'Reseña creada', resena });
+    res.status(201).json({ mensaje: 'Resena creada', resena });
   } catch (error) {
-    console.error('Error al crear reseña:', error);
-    res.status(500).json({ mensaje: 'Error al crear reseña', error: error.message });
+    console.error('Error al crear resena:', error);
+    res.status(500).json({ mensaje: 'Error al crear resena', error: error.message });
   }
 };
 
-// Obtener reseñas de un vendedor
-const obtenerReseñasPorVendedor = async (req, res) => {
+const obtenerResenasPorVendedor = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const reseñas = await Resena.findAll({
+    const resenas = await Resena.findAll({
       where: { vendedorId: id },
       include: [{ model: Usuario, as: 'Comprador', attributes: ['id', 'nombreCompleto'] }]
     });
 
-    res.json(reseñas);
+    res.json(resenas);
   } catch (error) {
-    console.error('Error al obtener reseñas:', error);
-    res.status(500).json({ mensaje: 'Error al obtener reseñas' });
+    console.error('Error al obtener resenas:', error);
+    res.status(500).json({ mensaje: 'Error al obtener resenas' });
   }
 };
 
-console.log("🧹 resenasController cargado correctamente");
-
 module.exports = {
-  crearReseña,
-  obtenerReseñasPorVendedor
+  crearResena,
+  obtenerResenasPorVendedor,
+  obtenerResenasPorComprador, // ✅ sin coma
 };
+
 
 
 

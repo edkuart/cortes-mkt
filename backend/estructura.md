@@ -1,5 +1,3 @@
-# 📦 Marketplace Modular - Backend
-
 # 📦 Backend - Marketplace Modular
 
 Este proyecto representa el backend de un marketplace modular creado con **Node.js**, **Express**, y **Sequelize (SQLite)**. Ahora incluye funcionalidades para manejar productos, usuarios, pedidos, autenticación, reseñas, devoluciones y notificación por correo electrónico.
@@ -80,6 +78,8 @@ frontend/
 │   ├── index.tsx
 │   ├── login.tsx
 │   ├── mis-pedidos.tsx
+│   ├── mis-resenas.tsx
+│   ├── crear-resena.tsx
 │   └── Pedidos-Vendedor.tsx
 ├── public/
 ├── services/
@@ -143,6 +143,7 @@ frontend/
 
 ### Reseñas
 - `GET /api/resenas/vendedor/:id`
+- `GET /api/resenas/comprador/:id`
 - `POST /api/resenas`
 
 ### Devoluciones
@@ -173,3 +174,4 @@ frontend/
 Para dudas o soporte: [edkuart@gmail.com](mailto:edkuart@gmail.com)
 
 ✨ Proyecto creado con fines educativos, con posibilidad de integrarse en aplicaciones móviles y futuras mejoras como notificaciones avanzadas y funciones de marketing.
+

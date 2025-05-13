@@ -6,11 +6,13 @@ import { Text, View } from 'react-native';
 import LoginScreen from '../screens/LoginScreen';
 import RegistroScreen from '../screens/RegistroScreen';
 import DashboardVendedor from '../screens/DashboardVendedor';
-import MisPedidos from '../screens/MisPedidos';
+import MisPedidos from '../screens/MisPedidosScreen';
 import ProductoDetalle from '../screens/ProductoDetalle';
+import CrearResenaScreen from '../screens/CrearResenaScreen';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import DevolucionesScreen from '../screens/DevolucionesScreen';
+import DetallePedidoScreen from '../screens/DetallePedidoScreen';
 
 const AppNavigator = () => {
   const { usuario } = useAuth();
@@ -46,7 +48,8 @@ const AppNavigator = () => {
             <Stack.Screen name="MisPedidos" component={MisPedidos} />
             <Stack.Screen name="ProductoDetalle" component={ProductoDetalle} />
             <Stack.Screen name="Devoluciones" component={DevolucionesScreen} />
-
+            <Stack.Screen name="DetallePedido" component={DetallePedidoScreen} />
+            <Stack.Screen name="CrearResena" component={CrearResenaScreen} />
           </>
         )}
       </Stack.Navigator>
@@ -55,5 +58,6 @@ const AppNavigator = () => {
 };
 
 export default AppNavigator;
+
 
 

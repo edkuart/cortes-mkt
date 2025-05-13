@@ -46,21 +46,22 @@ app.get('/debug/crear-usuario', async (req, res) => {
 // Importar rutas
 const usuariosRoutes = require('./routes/usuariosRoutes');
 const pedidosRoutes = require('./routes/pedidosRoutes');
-// const reseñasRoutes = require('./routes/reseñasRoutes'); // 🔴 Comentado temporalmente
 const authRoutes = require('./routes/authRoutes');
 const productosRoutes = require('./routes/productosRoutes');
 const aiRoutes = require('./routes/ai.routes');
-
 const entregasRoutes = require('./routes/entregasRoutes');
-app.use('/api/entregas', entregasRoutes);
+const resenasRoutes = require('./routes/resenasRoutes');
+
+
 
 // Usar rutas
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
-// app.use('/api/reseñas', reseñasRoutes); // 🔴 Comentado temporalmente
 app.use('/api/auth', authRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/ia', aiRoutes);
+app.use('/api/resenas', resenasRoutes);
+app.use('/api/entregas', entregasRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

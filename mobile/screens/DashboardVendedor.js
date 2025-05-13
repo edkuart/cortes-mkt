@@ -6,6 +6,7 @@ import { apiFetch } from '../services/api';
 import dayjs from 'dayjs';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
+import ResenasScreen from './ResenasScreen';
 
 const DashboardVendedor = () => {
   const [pedidos, setPedidos] = useState([]);
@@ -28,6 +29,14 @@ const DashboardVendedor = () => {
     obtenerPedidos();
   }, []);
 
+  const renderBotones = () => (
+    <View style={styles.botonera}>
+      <Button title="Devoluciones" onPress={() => navigation.navigate('Devoluciones')} />
+      <Button title="Reseñas" onPress={() => navigation.navigate('Resenas')} />
+      <Button title="Cerrar sesión" onPress={logout} color="#dc3545" />
+    </View>
+  );
+
   if (cargando) {
     return <ActivityIndicator size="large" style={{ marginTop: 100 }} />;
   }
@@ -35,8 +44,7 @@ const DashboardVendedor = () => {
   if (pedidos.length === 0) {
     return (
       <View style={styles.container}>
-        <Button title="Ver Devoluciones" onPress={() => navigation.navigate('ProductoDetalle', { pedidoId: item.id })} />
-        <Button title="Cerrar sesión" onPress={logout} color="#dc3545" />
+        {renderBotones()}
         <Text style={styles.empty}>No hay pedidos disponibles.</Text>
       </View>
     );
@@ -44,13 +52,12 @@ const DashboardVendedor = () => {
 
   return (
     <View style={styles.container}>
-      <Button title="Ver Devoluciones" onPress={() => navigation.navigate('Devoluciones')} />
-      <Button title="Cerrar sesión" onPress={logout} color="#dc3545" />
+      {renderBotones()}
       <FlatList
         data={pedidos}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => navigation.navigate('ProductoDetalle', { pedidoId: item.id })}>
+          <TouchableOpacity onPress={() => navigation.navigate('DetallePedido', { pedidoId: item.id })}>
             <View style={styles.card}>
               <Text style={styles.titulo}>Pedido #{item.id}</Text>
               <Text>Total: Q{item.total?.toFixed(2)}</Text>
@@ -66,6 +73,7 @@ const DashboardVendedor = () => {
 
 const styles = StyleSheet.create({
   container: { padding: 16 },
+  botonera: { marginBottom: 16, gap: 10 },
   card: {
     backgroundColor: '#f0f4ff',
     padding: 16,
@@ -77,4 +85,11 @@ const styles = StyleSheet.create({
 });
 
 export default DashboardVendedor;
+
+// Agregar en AppNavigator:
+// <Stack.Screen name="Resenas" component={ResenasScreen} />
+
+
+
+
 
