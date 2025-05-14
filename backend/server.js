@@ -28,19 +28,38 @@ app.get('/debug/crear-pedido', async (req, res) => {
   res.json(nuevo);
 });
 
+// ✅ Ruta corregida: ahora está fuera de la anterior
 app.get('/debug/crear-usuario', async (req, res) => {
-  const { Usuario } = require('./models');
+  const { Usuario, Vendedor } = require('./models');
   const bcrypt = require('bcryptjs');
 
-  const hash = await bcrypt.hash('123456', 10);
-  const nuevo = await Usuario.create({
-    nombreCompleto: 'Preda Welch',
-    correo: 'test@correo.com',
-    contraseña: hash,
-    rol: 'vendedor'
-  });
+  try {
+    // Buscar si ya existe por correo
+    const existente = await Usuario.findOne({ where: { correo: 'test@correo.com' } });
 
-  res.json(nuevo);
+    if (existente) {
+      return res.status(200).json({ mensaje: '⚠️ Usuario ya existe', usuario: existente });
+    }
+
+    const hash = await bcrypt.hash('123456', 10);
+
+    const nuevoUsuario = await Usuario.create({
+      nombreCompleto: 'Preda Welch',
+      correo: 'test@correo.com',
+      contraseña: hash,
+      rol: 'vendedor'
+    });
+
+    const nuevoVendedor = await Vendedor.create({
+      usuarioId: nuevoUsuario.id
+    });
+
+    res.status(201).json({ mensaje: '✅ Usuario y vendedor creados', usuario: nuevoUsuario, vendedor: nuevoVendedor });
+
+  } catch (error) {
+    console.error('❌ Error al crear usuario y vendedor:', error);
+    res.status(500).json({ mensaje: 'Error al crear usuario y vendedor' });
+  }
 });
 
 // Importar rutas
@@ -51,8 +70,6 @@ const productosRoutes = require('./routes/productosRoutes');
 const aiRoutes = require('./routes/ai.routes');
 const entregasRoutes = require('./routes/entregasRoutes');
 const resenasRoutes = require('./routes/resenasRoutes');
-
-
 
 // Usar rutas
 app.use('/api/usuarios', usuariosRoutes);
@@ -103,3 +120,4 @@ sequelize.sync({ alter: true })
   .catch((error) => {
     console.error("🔴 Error al sincronizar la base de datos:", error);
   });
+

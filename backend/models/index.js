@@ -66,5 +66,5 @@ module.exports = {
   Entrega,
   Vendedor,
   DetallePedido,
-  Devolucion, // ✅ Exportar el modelo
+  Devolucion, 
 };

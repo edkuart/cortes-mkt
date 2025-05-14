@@ -1,7 +1,8 @@
 // backend/controllers/productosController.js
 
 const Pedido = require('../models/pedido.model');
-const { Producto } = require('../models');
+const { Producto, Resena } = require('../models');
+const { Op } = require('sequelize');
 
 // Crear nuevo pedido
 const crearPedido = async (req, res) => {
@@ -54,8 +55,22 @@ const cambiarEstadoPedido = async (req, res) => {
 
 const obtenerProductos = async (req, res) => {
   try {
-    const productos = await Producto.findAll();
-    res.json(productos);
+    const productos = await Producto.findAll({
+      attributes: ['id', 'nombre', 'precio', 'imagen'],
+    });
+
+    const productosConPromedios = await Promise.all(productos.map(async (p) => {
+      const resenas = await Resena.findAll({ where: { productoId: p.id } });
+      const cantidad = resenas.length;
+      const promedio = cantidad > 0 ? resenas.reduce((acc, r) => acc + r.calificacion, 0) / cantidad : 0;
+      return {
+        ...p.toJSON(),
+        promedioCalificacion: promedio.toFixed(1),
+        cantidadResenas: cantidad
+      };
+    }));
+
+    res.json(productosConPromedios);
   } catch (error) {
     console.error('Error al obtener productos:', error);
     res.status(500).json({ mensaje: 'Error al obtener productos' });
@@ -133,6 +148,22 @@ const eliminarProducto = async (req, res) => {
   }
 };
 
+const obtenerPromedioCalificacion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const resenas = await Resena.findAll({ where: { productoId: id } });
+    if (resenas.length === 0) {
+      return res.json({ promedio: 0, cantidad: 0 });
+    }
+    const suma = resenas.reduce((acc, r) => acc + r.calificacion, 0);
+    const promedio = suma / resenas.length;
+    res.json({ promedio: promedio.toFixed(1), cantidad: resenas.length });
+  } catch (error) {
+    console.error('Error al calcular promedio:', error);
+    res.status(500).json({ mensaje: 'Error al calcular promedio' });
+  }
+};
+
 module.exports = {
   crearPedido,
   obtenerPedidosPorUsuario,
@@ -141,6 +172,6 @@ module.exports = {
   obtenerProductoPorId,
   crearProducto,
   actualizarProducto,
-  eliminarProducto
+  eliminarProducto,
+  obtenerPromedioCalificacion
 };
-

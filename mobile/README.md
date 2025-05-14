@@ -34,7 +34,8 @@ mobile/
 │   ├── DashboardVendedor.js
 │   ├── MisPedidos.js
 │   ├── DevolucionesScreen.js
-│   └── DetallePedidoScreen.js
+│   ├── DetallePedidoScreen.js
+│   └── ResenasScreen.js
 ├── services/
 │   └── api.js
 └── assets/
@@ -76,22 +77,23 @@ npx expo start --clear
 - Vista de pedidos del vendedor (token protegido)
 - Vista de devoluciones con botones para aceptar/rechazar
 - Vista de detalle del pedido con productos, totales y estado
+- Vista de reseñas con nombre del cliente, comentario, calificación y fecha
 - Logout y limpieza de sesión
 
 ---
 
 ## 🔐 API protegida
 
-Las peticiones autenticadas (por ejemplo `/api/pedidos/vendedor`, `/api/devoluciones`) usan automáticamente el token JWT almacenado en el dispositivo.
+Las peticiones autenticadas (por ejemplo `/api/pedidos/vendedor`, `/api/devoluciones`, `/api/resenas/vendedor/:id`) usan automáticamente el token JWT almacenado en el dispositivo.
 
 ---
 
 ## ⬆️ Próximas Funciones (sugeridas)
 
 - Menú lateral con navegación entre módulos
-- Reseñas del vendedor
 - Exportación PDF (resumen del mes)
 - Notificaciones push con Firebase
+- Perfil de usuario editable
 
 ---
 
@@ -99,7 +101,7 @@ Las peticiones autenticadas (por ejemplo `/api/pedidos/vendedor`, `/api/devoluci
 
 ```bash
 git add mobile/
-git commit -m "🧾 Detalle de pedido móvil con navegación desde el dashboard"
+git commit -m "⭐ Pantalla de reseñas del vendedor integrada con navegación y consumo de API"
 ```
 
 ---
@@ -107,4 +109,5 @@ git commit -m "🧾 Detalle de pedido móvil con navegación desde el dashboard"
 ## 📬 Contacto
 
 Para dudas o soporte: [edkuart@gmail.com](mailto:edkuart@gmail.com)
+
 

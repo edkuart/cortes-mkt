@@ -25,6 +25,9 @@ router.delete('/:id', verificarToken, productosController.eliminarProducto);
 // Crear un nuevo pedido
 router.post('/crear', productosController.crearPedido);
 
+router.get('/:id/promedio-calificacion', productosController.obtenerPromedioCalificacion);
+
+
 module.exports = router;
 
 

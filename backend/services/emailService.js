@@ -1,3 +1,5 @@
+// backend/services/emailService.js
+
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 

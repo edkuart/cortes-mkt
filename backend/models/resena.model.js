@@ -1,43 +1,59 @@
-// 📁 backend/models/resena.model.js
-
+// backend/models/producto.model.js
 module.exports = (sequelize, DataTypes) => {
-  const Resena = sequelize.define('resena', {
+  const Producto = sequelize.define('producto', {
     vendedorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    },
-    compradorId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    pedidoId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    comentario: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    calificacion: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        min: 1,
-        max: 5
+      references: {
+        model: 'vendedores',
+        key: 'usuarioId'
       }
     },
+    nombre: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    descripcion: DataTypes.TEXT,
+    precio: {
+      type: DataTypes.FLOAT,
+      allowNull: false
+    },
+    stock: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    categoria: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    activo: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    imagen: {
+      type: DataTypes.STRING,
+      allowNull: true
+    }
   }, {
-    tableName: 'resenas',
-    timestamps: true,
+    tableName: 'productos',
+    timestamps: true
   });
 
-  Resena.associate = (models) => {
-    Resena.belongsTo(models.Usuario, { foreignKey: 'compradorId', as: 'Comprador' });
-    Resena.belongsTo(models.Usuario, { foreignKey: 'vendedorId', as: 'Vendedor' });
-    Resena.belongsTo(models.Pedido, { foreignKey: 'pedidoId', as: 'Pedido' });
+  Producto.associate = (models) => {
+    Producto.hasMany(models.Resena, {
+      foreignKey: 'productoId',
+      as: 'resenas'
+    });
+
+    Producto.belongsTo(models.Vendedor, {
+      foreignKey: 'vendedorId',
+      as: 'vendedor'
+    });
   };
 
-  return Resena;
+  return Producto;
 };
+
+
 
 

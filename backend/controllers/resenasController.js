@@ -19,6 +19,22 @@ const obtenerResenasPorComprador = async (req, res) => {
   }
 };
 
+// Verificar si ya existe una reseña para un pedido específico
+const verificarSiYaReseno = async (req, res) => {
+  try {
+    const { compradorId, pedidoId } = req.params;
+
+    const yaExiste = await Resena.findOne({
+      where: { compradorId, pedidoId }
+    });
+
+    res.json({ yaExiste: !!yaExiste });
+  } catch (error) {
+    console.error('Error al verificar existencia de reseña:', error);
+    res.status(500).json({ mensaje: 'Error al verificar reseña' });
+  }
+};
+
 // Crear una nueva resena
 const crearResena = async (req, res) => {
   try {
@@ -33,7 +49,6 @@ const crearResena = async (req, res) => {
       return res.status(400).json({ mensaje: 'La calificacion debe estar entre 1 y 5.' });
     }
 
-    // Validar que no exista ya una resena para ese pedido y comprador
     const yaExiste = await Resena.findOne({
       where: {
         vendedorId,
@@ -77,13 +92,42 @@ const obtenerResenasPorVendedor = async (req, res) => {
   }
 };
 
+const obtenerPorProducto = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const resenas = await Resena.findAll({
+      where: { productoId: id },
+      include: [{ model: Usuario, attributes: ['nombreCompleto'] }],
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(resenas);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al obtener reseñas del producto' });
+  }
+};
+
+const obtenerUltimasPorProducto = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const resenas = await Resena.findAll({
+      where: { productoId: id },
+      include: [{ model: Usuario, attributes: ['nombreCompleto'] }],
+      order: [['createdAt', 'DESC']],
+      limit: 2
+    });
+    res.json(resenas);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al obtener reseñas recientes del producto' });
+  }
+};
+
 module.exports = {
   crearResena,
   obtenerResenasPorVendedor,
-  obtenerResenasPorComprador, // ✅ sin coma
+  obtenerResenasPorComprador,
+  verificarSiYaReseno,
+  obtenerPorProducto,
+  obtenerUltimasPorProducto
 };
-
-
-
-
-

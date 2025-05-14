@@ -232,7 +232,3 @@ module.exports = {
   obtenerPedidosPorVendedor,
   obtenerPedidoPorId,
 };
-
-
-
-
