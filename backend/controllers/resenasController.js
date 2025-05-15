@@ -1,6 +1,7 @@
 // 📁 backend/controllers/resenasController.js
 
 const { Resena, Usuario } = require('../models');
+const dayjs = require("dayjs");
 
 // Obtener reseñas de un comprador específico
 const obtenerResenasPorComprador = async (req, res) => {
@@ -76,6 +77,73 @@ const crearResena = async (req, res) => {
   }
 };
 
+const responderResena = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { respuesta } = req.body;
+
+    const resena = await Resena.findByPk(id);
+    if (!resena) {
+      return res.status(404).json({ mensaje: "Reseña no encontrada" });
+    }
+
+    if (resena.respuestaVendedor) {
+      return res.status(400).json({ mensaje: "La reseña ya ha sido respondida" });
+    }
+
+    resena.respuestaVendedor = respuesta;
+    await resena.save();
+
+    res.json({ mensaje: "Respuesta enviada", resena });
+  } catch (error) {
+    console.error("Error al responder reseña:", error);
+    res.status(500).json({ mensaje: "Error interno" });
+  }
+};
+
+const editarResena = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { calificacion, comentario } = req.body;
+    const resena = await Resena.findByPk(id);
+
+    if (!resena) return res.status(404).json({ mensaje: "Reseña no encontrada" });
+
+    const haceMasDe24h = dayjs().diff(dayjs(resena.createdAt), 'hour') > 24;
+    if (haceMasDe24h) {
+      return res.status(403).json({ mensaje: "Solo se puede editar dentro de las 24h" });
+    }
+
+    resena.calificacion = calificacion || resena.calificacion;
+    resena.comentario = comentario || resena.comentario;
+    await resena.save();
+
+    res.json({ mensaje: "Reseña actualizada", resena });
+  } catch (err) {
+    console.error("Error al editar reseña:", err);
+    res.status(500).json({ mensaje: "Error interno" });
+  }
+};
+
+const eliminarResena = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const resena = await Resena.findByPk(id);
+
+    if (!resena) return res.status(404).json({ mensaje: "Reseña no encontrada" });
+
+    if (resena.respuestaVendedor) {
+      return res.status(403).json({ mensaje: "No se puede eliminar una reseña ya respondida" });
+    }
+
+    await resena.destroy();
+    res.json({ mensaje: "Reseña eliminada" });
+  } catch (err) {
+    console.error("Error al eliminar reseña:", err);
+    res.status(500).json({ mensaje: "Error interno" });
+  }
+};
+
 const obtenerResenasPorVendedor = async (req, res) => {
   try {
     const { id } = req.params;
@@ -89,6 +157,50 @@ const obtenerResenasPorVendedor = async (req, res) => {
   } catch (error) {
     console.error('Error al obtener resenas:', error);
     res.status(500).json({ mensaje: 'Error al obtener resenas' });
+  }
+};
+
+const guardarRespuestaVendedor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { respuesta } = req.body;
+
+    const resena = await Resena.findByPk(id);
+    if (!resena) return res.status(404).json({ mensaje: 'Reseña no encontrada' });
+
+    resena.respuestaVendedor = respuesta;
+    await resena.save();
+
+    res.json({ mensaje: 'Respuesta guardada', resena });
+  } catch (error) {
+    console.error('Error al guardar respuesta del vendedor:', error);
+    res.status(500).json({ mensaje: 'Error al guardar respuesta' });
+  }
+};
+
+const actualizarRespuestaVendedor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { respuestaVendedor } = req.body;
+
+    if (!respuestaVendedor) {
+      return res.status(400).json({ mensaje: 'Respuesta no puede estar vacía' });
+    }
+
+    const resena = await Resena.findByPk(id);
+    if (!resena) return res.status(404).json({ mensaje: 'Reseña no encontrada' });
+
+    if (resena.respuestaVendedor) {
+      return res.status(403).json({ mensaje: 'Ya respondiste esta reseña' });
+    }
+
+    resena.respuestaVendedor = respuestaVendedor;
+    await resena.save();
+
+    res.json({ mensaje: 'Respuesta guardada', resena });
+  } catch (error) {
+    console.error('Error al guardar respuesta del vendedor:', error);
+    res.status(500).json({ mensaje: 'Error al guardar respuesta del vendedor' });
   }
 };
 
@@ -129,5 +241,10 @@ module.exports = {
   obtenerResenasPorComprador,
   verificarSiYaReseno,
   obtenerPorProducto,
-  obtenerUltimasPorProducto
+  obtenerUltimasPorProducto,
+  editarResena,
+  eliminarResena,
+  responderResena,
+  guardarRespuestaVendedor,
+  actualizarRespuestaVendedor,
 };

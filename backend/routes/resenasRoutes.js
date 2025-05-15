@@ -9,6 +9,9 @@ const {
   verificarSiYaReseno,
   obtenerPorProducto,
   obtenerUltimasPorProducto,
+  editarResena,
+  eliminarResena,
+  guardarRespuestaVendedor
 } = require('../controllers/resenasController');
 const { verificarToken } = require('../middleware/authMiddleware');
 
@@ -28,6 +31,12 @@ router.get('/verificar/:compradorId/:pedidoId', verificarSiYaReseno);
 router.get('/producto/:id', obtenerPorProducto);
 
 router.get('/producto/:id/ultimas', obtenerUltimasPorProducto);
+
+router.patch("/:id", verificarToken, editarResena); 
+
+router.delete("/:id", verificarToken, eliminarResena); 
+
+router.patch('/:id/respuesta', guardarRespuestaVendedor);
 
 console.log("🧹 resenasRoutes cargado correctamente");
 

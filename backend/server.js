@@ -62,6 +62,34 @@ app.get('/debug/crear-usuario', async (req, res) => {
   }
 });
 
+app.get('/debug/crear-comprador', async (req, res) => {
+  const { Usuario } = require('./models');
+  const bcrypt = require('bcryptjs');
+
+  try {
+    const existente = await Usuario.findOne({ where: { correo: 'comprador@correo.com' } });
+
+    if (existente) {
+      return res.status(200).json({ mensaje: '⚠️ Comprador ya existe', usuario: existente });
+    }
+
+    const hash = await bcrypt.hash('123456', 10);
+
+    const nuevoUsuario = await Usuario.create({
+      nombreCompleto: 'Comprador Test',
+      correo: 'comprador@correo.com',
+      contraseña: hash,
+      rol: 'comprador'
+    });
+
+    res.status(201).json({ mensaje: '✅ Comprador creado', usuario: nuevoUsuario });
+
+  } catch (error) {
+    console.error('❌ Error al crear comprador:', error);
+    res.status(500).json({ mensaje: 'Error al crear comprador' });
+  }
+});
+
 // Importar rutas
 const usuariosRoutes = require('./routes/usuariosRoutes');
 const pedidosRoutes = require('./routes/pedidosRoutes');
