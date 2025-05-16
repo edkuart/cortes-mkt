@@ -1,6 +1,6 @@
 // backend/models/vendedor.model.js
 module.exports = (sequelize, DataTypes) => {
-    const Vendedor = sequelize.define('vendedor', {
+    const vendedor = sequelize.define('vendedor', {
       usuarioId: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -34,6 +34,6 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true
     });
   
-    return Vendedor;
+    return vendedor;
   };
   

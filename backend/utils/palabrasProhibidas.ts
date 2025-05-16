@@ -1,3 +1,5 @@
+// backend/utils/palabrasProhibidas.ts
+
 const palabrasProhibidas: string[] = [
     "insulto1",
     "insulto2",

@@ -56,7 +56,7 @@ const cambiarEstadoPedido = async (req, res) => {
 const obtenerProductos = async (req, res) => {
   try {
     const productos = await Producto.findAll({
-      attributes: ['id', 'nombre', 'precio', 'imagen'],
+      attributes: ['id', 'nombre', 'precio', 'imagen', 'vendedorId'],
     });
 
     const productosConPromedios = await Promise.all(productos.map(async (p) => {
@@ -65,7 +65,7 @@ const obtenerProductos = async (req, res) => {
       const promedio = cantidad > 0 ? resenas.reduce((acc, r) => acc + r.calificacion, 0) / cantidad : 0;
       return {
         ...p.toJSON(),
-        promedioCalificacion: promedio.toFixed(1),
+        promedioCalificacion: parseFloat(promedio.toFixed(1)),
         cantidadResenas: cantidad
       };
     }));
@@ -77,21 +77,10 @@ const obtenerProductos = async (req, res) => {
   }
 };
 
-const obtenerProductoPorId = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const producto = await Producto.findByPk(id);
-    if (!producto) return res.status(404).json({ mensaje: 'Producto no encontrado' });
-    res.json(producto);
-  } catch (error) {
-    console.error('Error al obtener producto:', error);
-    res.status(500).json({ mensaje: 'Error al obtener producto' });
-  }
-};
-
 const crearProducto = async (req, res) => {
   try {
     const { nombre, descripcion, precio, stock, categoria, vendedorId } = req.body;
+
     const nuevoProducto = await Producto.create({
       nombre,
       descripcion,
@@ -101,10 +90,24 @@ const crearProducto = async (req, res) => {
       vendedorId,
       imagen: req.file ? req.file.path : null
     });
-    res.status(201).json(nuevoProducto);
+
+    res.status(201).json({ mensaje: 'Producto creado correctamente', producto: nuevoProducto });
   } catch (error) {
     console.error('Error al crear producto:', error);
-    res.status(500).json({ mensaje: 'Error al crear producto' });
+    res.status(500).json({ mensaje: 'Error al crear producto', error: error.message });
+  }
+};
+
+
+const obtenerProductoPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const producto = await Producto.findByPk(id);
+    if (!producto) return res.status(404).json({ mensaje: 'Producto no encontrado' });
+    res.json(producto);
+  } catch (error) {
+    console.error('Error al obtener producto:', error);
+    res.status(500).json({ mensaje: 'Error al obtener producto' });
   }
 };
 

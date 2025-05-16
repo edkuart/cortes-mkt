@@ -2,6 +2,9 @@
 
 const { Resena, Usuario } = require('../models');
 const dayjs = require("dayjs");
+const { enviarCorreo } = require('../controllers/notificacionesController');
+const { actualizarRankingDeVendedor } = require('../utils/actualizarRanking');
+const { Op, fn, col } = require('sequelize');
 
 // Obtener reseñas de un comprador específico
 const obtenerResenasPorComprador = async (req, res) => {
@@ -17,6 +20,34 @@ const obtenerResenasPorComprador = async (req, res) => {
   } catch (error) {
     console.error('Error al obtener reseñas del comprador:', error);
     res.status(500).json({ mensaje: 'Error al obtener reseñas' });
+  }
+};
+
+// 📊 Obtener resumen mensual de reseñas de un vendedor
+const obtenerResumenMensualResenas = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const resenas = await Resena.findAll({
+      where: {
+        vendedorId: id,
+        createdAt: {
+          [Op.gte]: dayjs().subtract(12, 'month').startOf('month').toDate()
+        }
+      },
+      attributes: [
+        [fn('strftime', '%Y-%m', col('createdAt')), 'mes'],
+        [fn('COUNT', '*'), 'cantidad'],
+        [fn('AVG', col('calificacion')), 'promedio']
+      ],
+      group: ['mes'],
+      order: [[fn('strftime', '%Y-%m', col('createdAt')), 'ASC']]
+    });
+
+    res.json(resenas);
+  } catch (error) {
+    console.error('Error al obtener resumen mensual de reseñas:', error);
+    res.status(500).json({ mensaje: 'Error al obtener resumen mensual' });
   }
 };
 
@@ -70,6 +101,8 @@ const crearResena = async (req, res) => {
       pedidoId
     });
 
+    await actualizarRankingDeVendedor(vendedorId);
+
     res.status(201).json({ mensaje: 'Resena creada', resena });
   } catch (error) {
     console.error('Error al crear resena:', error);
@@ -117,6 +150,8 @@ const editarResena = async (req, res) => {
     resena.calificacion = calificacion || resena.calificacion;
     resena.comentario = comentario || resena.comentario;
     await resena.save();
+
+    await actualizarRankingDeVendedor(resena.vendedorId);
 
     res.json({ mensaje: "Reseña actualizada", resena });
   } catch (err) {
@@ -247,4 +282,5 @@ module.exports = {
   responderResena,
   guardarRespuestaVendedor,
   actualizarRespuestaVendedor,
+  obtenerResumenMensualResenas,
 };

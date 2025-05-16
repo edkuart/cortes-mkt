@@ -98,6 +98,7 @@ const productosRoutes = require('./routes/productosRoutes');
 const aiRoutes = require('./routes/ai.routes');
 const entregasRoutes = require('./routes/entregasRoutes');
 const resenasRoutes = require('./routes/resenasRoutes');
+const vendedoresRoutes = require('./routes/vendedoresRoutes');
 
 // Usar rutas
 app.use('/api/usuarios', usuariosRoutes);
@@ -107,6 +108,7 @@ app.use('/api/productos', productosRoutes);
 app.use('/api/ia', aiRoutes);
 app.use('/api/resenas', resenasRoutes);
 app.use('/api/entregas', entregasRoutes);
+app.use('/api/vendedores', vendedoresRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {
@@ -126,9 +128,21 @@ app.use('/api/notificaciones', notificacionesRoutes);
 const PORT = process.env.PORT || 4000;
 const { sequelize } = require('./models');
 
-sequelize.sync({ alter: true })
-  .then(() => {
+sequelize.sync({ force: true })
+  .then(async () => {
     console.log("🟢 Base de datos sincronizada correctamente");
+
+    // 👀 Verificar que la tabla productos tenga promedioCalificacion
+    const estructura = await sequelize.getQueryInterface().describeTable('productos');
+    console.log("📊 Estructura de la tabla productos:");
+    console.table(estructura);
+
+    if (!estructura.promedioCalificacion) {
+      console.warn("❌ promedioCalificacion NO está en la tabla. Revisa el modelo o el require.");
+    } else {
+      console.log("✅ promedioCalificacion está presente correctamente.");
+    }
+
     const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 
@@ -148,4 +162,5 @@ sequelize.sync({ alter: true })
   .catch((error) => {
     console.error("🔴 Error al sincronizar la base de datos:", error);
   });
+
 

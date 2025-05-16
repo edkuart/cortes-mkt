@@ -1,12 +1,12 @@
-// backend/controllers/vendedoresController.js
+// 📁 backend/controllers/vendedoresController.js
 
-const { vendedor } = require('../models');
+const { vendedor, RankingVendedor } = require('../models');
 
 exports.solicitarVendedor = async (req, res) => {
     try {
       const { usuarioId, nombreComercial } = req.body;
       const files = req.files;
-  
+
       const nuevo = await vendedor.create({
         usuarioId,
         nombreComercial,
@@ -15,13 +15,13 @@ exports.solicitarVendedor = async (req, res) => {
         selfieConDPI: files?.selfieConDPI?.[0]?.path,
         licenciaConducir: files?.licenciaConducir?.[0]?.path,
       });
-  
+
       res.status(201).json({ mensaje: 'Solicitud enviada', data: nuevo });
     } catch (err) {
       res.status(500).json({ mensaje: 'Error al registrar vendedor', error: err });
     }
-  };
-  
+};
+
 exports.obtenerPerfil = async (req, res) => {
   try {
     const vendedorPerfil = await vendedor.findByPk(req.params.id);
@@ -47,3 +47,19 @@ exports.aprobarVendedor = async (req, res) => {
   }
 };
 
+exports.obtenerRankingVendedor = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const ranking = await RankingVendedor.findOne({ where: { vendedorId: id } });
+
+    if (!ranking) {
+      return res.status(404).json({ mensaje: 'Ranking no encontrado para este vendedor' });
+    }
+
+    res.json(ranking);
+  } catch (error) {
+    console.error('Error al obtener ranking del vendedor:', error);
+    res.status(500).json({ mensaje: 'Error al obtener ranking' });
+  }
+};

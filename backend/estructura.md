@@ -14,7 +14,7 @@ Este proyecto representa el backend de un marketplace modular creado con **Node.
 - Nodemailer (notificaciones por correo)
 - dotenv
 - nodemon (desarrollo)
-- dayjs
+- day.js (fechas)
 - bcryptjs
 - Cors + JWT
 
@@ -58,8 +58,8 @@ backend/
 ├── services/
 │   ├── aiService.js
 │   └── openaiClient.js
-├── utils/
-│   └── palabrasProhibidas.json
+
+
 ```
 
 frontend/
@@ -195,7 +195,7 @@ sequelize.sync({ force: true })
 
 ---
 
-## 🔥 Funcionalidades Nuevas
+🔥 Funcionalidades Nuevas
 
 - ✏️ **Editar reseñas** (dentro de 24h)
 - 🗑️ **Eliminar reseñas** (si no tienen respuesta)
@@ -207,7 +207,7 @@ sequelize.sync({ force: true })
 
 ---
 
-## 📬 Contacto
+📬 Contacto
 
 Para dudas o soporte: [edkuart@gmail.com](mailto:edkuart@gmail.com)
 

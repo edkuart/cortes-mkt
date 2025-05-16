@@ -1,0 +1,59 @@
+### Crear reseña (válida)
+POST http://localhost:4000/api/resenas
+Content-Type: application/json
+Authorization: Bearer {{TOKEN_COMPRADOR}}
+
+{
+  "vendedorId": 2,
+  "pedidoId": 3,
+  "comentario": "Producto excelente, llegó rápido",
+  "calificacion": 5
+}
+
+###
+
+### Verificar si ya hizo reseña
+GET http://localhost:4000/api/resenas/verificar/1/3
+
+###
+
+### Editar reseña (válida si < 24h)
+PATCH http://localhost:4000/api/resenas/5
+Content-Type: application/json
+Authorization: Bearer {{TOKEN_COMPRADOR}}
+
+{
+  "comentario": "Lo pensé mejor, me encantó.",
+  "calificacion": 5
+}
+
+###
+
+### Eliminar reseña (válido solo si no fue respondida)
+DELETE http://localhost:4000/api/resenas/5
+Authorization: Bearer {{TOKEN_COMPRADOR}}
+
+###
+
+### Intentar crear reseña ofensiva
+POST http://localhost:4000/api/resenas
+Content-Type: application/json
+Authorization: Bearer {{TOKEN_COMPRADOR}}
+
+{
+  "vendedorId": 2,
+  "pedidoId": 4,
+  "comentario": "Este vendedor es un idiota",
+  "calificacion": 1
+}
+
+###
+
+### Responder reseña como vendedor
+PATCH http://localhost:4000/api/resenas/5
+Content-Type: application/json
+Authorization: Bearer {{TOKEN_VENDEDOR}}
+
+{
+  "respuestaVendedor": "Gracias por tu comentario, lo valoramos mucho."
+}

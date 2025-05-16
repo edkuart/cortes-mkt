@@ -1,4 +1,4 @@
-// backend/models/pedido.model.js
+// 📁 backend/models/pedido.model.js
 
 module.exports = (sequelize, DataTypes) => {
   const Pedido = sequelize.define('pedido', {
@@ -19,13 +19,29 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
   });
 
-  // 🧩 Relación con devoluciones
   Pedido.associate = (models) => {
-    Pedido.hasMany(models.Devolucion, { foreignKey: 'pedidoId' });
+    Pedido.hasMany(models.DetallePedido, {
+      foreignKey: 'pedidoId',
+      as: 'detalles'
+    });
+
+    Pedido.hasOne(models.Entrega, {
+      foreignKey: 'pedidoId'
+    });
+
+    Pedido.hasMany(models.Devolucion, {
+      foreignKey: 'pedidoId'
+    });
+
+    Pedido.belongsTo(models.Usuario, {
+      foreignKey: 'compradorId',
+      as: 'comprador'
+    });
   };
 
   return Pedido;
 };
+
 
 
 

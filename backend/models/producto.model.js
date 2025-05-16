@@ -1,4 +1,4 @@
-// backend/models/producto.model.js
+// 📁 backend/models/producto.model.js (actualizado sin promedioCalificacion)
 
 module.exports = (sequelize, DataTypes) => {
   const Producto = sequelize.define('producto', {
@@ -76,6 +76,8 @@ module.exports = (sequelize, DataTypes) => {
 
   return Producto;
 };
+
+
 
 
 
