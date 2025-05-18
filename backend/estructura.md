@@ -17,6 +17,7 @@ Este proyecto representa el backend de un marketplace modular creado con **Node.
 - day.js (fechas)
 - bcryptjs
 - Cors + JWT
+- Google Auth Library (OAuth2.0)
 
 ---
 
@@ -59,42 +60,70 @@ backend/
 │   ├── aiService.js
 │   └── openaiClient.js
 
-
 ```
 
 frontend/
 ├── components/
-│   ├── IAResponseBox.tsx
-│   ├── Layout.tsx
-│   ├── PedidoCard.tsx
-│   ├── PedidoForm.tsx
-│   ├── ProductoCard.tsx
-│   ├── ProductoForm.tsx
-│   ├── ReseñasBox.tsx
-│   └── SolicitarDevolucion.tsx
+│   ├── Form/
+│   │   ├── InputArchivo.tsx          # 📤 Input especializado para archivos (vendedor)
+│   │   ├── InputText.tsx             # 🧾 Reutilizable para inputs de texto/email/password
+│   │   └── SelectRol.tsx             # 👤 Selector de rol (comprador/vendedor)
+│   ├── Estrellas.tsx                 # ⭐ Visualizador de calificación
+│   ├── IAResponseBox.tsx             # 🤖 Respuestas generadas por IA
+│   ├── Layout.tsx                    # 🧱 Layout general (si aplica)
+│   ├── PedidoCard.tsx                # 🧾 Vista individual de un pedido
+│   ├── PedidoForm.tsx                # 📥 Formulario de solicitud
+│   ├── ProductoCard.tsx              # 🛍 Vista individual de producto
+│   ├── ProductoForm.tsx              # 🧾 Formulario para crear producto
+│   ├── ReseñasBox.tsx                # ✍️ Caja para ver y dejar reseñas
+│   └── SolicitarDevolucion.tsx       # 📦 Solicitud de devolución
+│
 ├── hooks/
-│   └── useAuth.ts
+│   ├── useAuth.ts                    # 🔐 Autenticación con token localStorage
+│   ├── useIA.ts                      # ⚙️ Llamadas a la IA
+│   └── useResenasProducto.ts         # 🔁 Hook para reseñas públicas de producto
+│
 ├── pages/
 │   ├── api/
-│   ├── _app.tsx
+│   │   └── hello.ts
+│   ├── comprador/
+│   │   ├── carrito.tsx
+│   │   ├── crear-resena.tsx
+│   │   ├── editar-resena.tsx
+│   │   ├── mis-pedidos.tsx
+│   │   └── mis-resenas.tsx
+│   ├── resenas-producto/
+│   │   ├── [id].tsx
+│   │   └── resumen.tsx
+│   ├── vendedor/
+│   │   ├── dashboard-vendedor.tsx
+│   │   ├── panel-vendedor.tsx
+│   │   ├── Pedidos-Vendedor.tsx
+│   │   ├── responder-resenas.tsx
+│   │   └── resumen-resenas.tsx
+│   ├── _app.tsx                      # 🌐 Configura GoogleOAuthProvider
 │   ├── _document.tsx
-│   ├── carrito.tsx
-│   ├── dashboard-vendedor.tsx
 │   ├── ia.tsx
 │   ├── index.tsx
-│   ├── login.tsx
-│   ├── mis-pedidos.tsx
-│   ├── mis-resenas.tsx
-│   ├── crear-resena.tsx
-│   └── Pedidos-Vendedor.tsx
+│   ├── login.tsx                     # 🔐 Incluye login tradicional y con Google
+│   └── registro.tsx                  # ✅ Registro tradicional y con Google
+│
 ├── public/
+│   └── (imágenes, íconos, etc.)
+│
 ├── services/
+│   └── apiService.ts
+│
 ├── styles/
+│   └── globals.css
+│
+├── utils/
+│   └── estrellas.ts
+│
+├── .env.local                        # ⚙️ Incluye NEXT_PUBLIC_GOOGLE_CLIENT_ID
 ├── tailwind.config.js
 ├── tsconfig.json
-├── next.config.ts
-├── next-env.d.ts
-└── README.md
+└── next.config.js
 ```
 
 ---
@@ -117,6 +146,7 @@ EMAIL_USER=tu_correo@gmail.com
 EMAIL_PASS=tu_contraseña_app
 ADMIN_EMAIL=correo_admin@gmail.com
 EMAIL_FROM=Marketplace <tu_correo@gmail.com>
+GOOGLE_CLIENT_ID=tu_google_client_id
 
     Iniciar servidor:
 
@@ -128,6 +158,8 @@ npm run dev
     POST /api/auth/login
 
     POST /api/auth/registro
+
+    POST /api/auth/login-google
 
 👤 Usuarios
 
@@ -188,8 +220,9 @@ npm run dev
     Base de datos se sincroniza automáticamente.
 
     Se puede forzar reseteo con:
-
+```js
 sequelize.sync({ force: true })
+```
 
     La lógica de notificación por correo está desacoplada y puede reutilizarse en otras acciones (como devoluciones).
 
@@ -204,6 +237,7 @@ sequelize.sync({ force: true })
 - 📩 **Notificación automática al recibir reseñas**
 - 📊 **Ranking e historial de calificaciones**
 - ✅ **Control por rol (comprador vs. vendedor)**
+- 🔐 **Login con Google integrado (OAuth 2.0)**
 
 ---
 

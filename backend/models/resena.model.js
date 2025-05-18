@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    pedidoId: {
+      type: DataTypes.INTEGER,
+      allowNull: false, // 🔥 este campo estaba faltando
+    },
     calificacion: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -42,8 +46,13 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'productoId',
       as: 'Producto'
     });
+
+    // (Opcional) Si querés también vincular al modelo Pedido:
+    // Resena.belongsTo(models.Pedido, {
+    //   foreignKey: 'pedidoId',
+    //   as: 'Pedido'
+    // });
   };
 
   return Resena;
 };
-
