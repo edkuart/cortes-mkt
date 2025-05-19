@@ -38,7 +38,7 @@ exports.registrar = async (req, res) => {
 
       await Vendedor.create({
         usuarioId: nuevoUsuario.id,
-        nombreComercial: nombreComercial || nombreCompleto, // opcional
+        nombreComercial: nombreComercial || nombreCompleto,
         telefono,
         direccion,
         municipio,
@@ -122,4 +122,3 @@ exports.loginConGoogle = async (req, res) => {
     res.status(401).json({ mensaje: 'Token de Google inválido' });
   }
 };
-

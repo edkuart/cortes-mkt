@@ -13,6 +13,23 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true
       },
+      telefono: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      direccion: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      municipio: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      departamento: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      
       fotoDPIFrente: DataTypes.STRING,
       fotoDPIReverso: DataTypes.STRING,
       selfieConDPI: DataTypes.STRING,

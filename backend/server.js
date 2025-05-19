@@ -10,6 +10,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/uploads', express.static('uploads'));
+
 // Luego ya tus rutas:
 const devolucionesRoutes = require('./routes/devolucionesRoutes');
 app.use('/api/devoluciones', devolucionesRoutes);

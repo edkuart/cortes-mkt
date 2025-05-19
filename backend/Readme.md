@@ -65,7 +65,13 @@ curl -X POST http://localhost:4000/api/resenas \
     "calificacion": 5
   }'
 ```
-
+## 7. actualizar la imagen de perfil del vendedor
+```bash
+curl -X PATCH http://localhost:4000/api/usuarios/:id \
+  -H "Authorization: Bearer TU_TOKEN" \
+  -F "nombreCompleto=Nuevo Nombre" \
+  -F "correo=nuevo@correo.com" \
+  -F "fotoPerfil=@/ruta/a/la/imagen.jpg"
 ---
 
 ## ✅ Requisitos clave para que funcione
