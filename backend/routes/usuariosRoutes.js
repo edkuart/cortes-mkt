@@ -5,7 +5,8 @@ const router = express.Router();
 const {
   actualizarPerfil,
   obtenerUsuarios,
-  loginDebug
+  loginDebug,
+  cambiarContrasena
 } = require('../controllers/usuariosController');
 const verificarToken = require('../middleware/verificarToken');
 const multer = require('multer');
@@ -28,5 +29,7 @@ router.patch('/:id', verificarToken, upload.fields([{ name: 'fotoPerfil', maxCou
 
 // Ruta de prueba
 router.post('/debug/token', loginDebug);
+
+router.patch('/:id/password', verificarToken, cambiarContrasena);
 
 module.exports = router;

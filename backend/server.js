@@ -101,6 +101,7 @@ const aiRoutes = require('./routes/ai.routes');
 const entregasRoutes = require('./routes/entregasRoutes');
 const resenasRoutes = require('./routes/resenasRoutes');
 const vendedoresRoutes = require('./routes/vendedoresRoutes');
+const mensajesRoutes = require('./routes/mensajesRoutes');
 
 // Usar rutas
 app.use('/api/usuarios', usuariosRoutes);
@@ -111,6 +112,7 @@ app.use('/api/ia', aiRoutes);
 app.use('/api/resenas', resenasRoutes);
 app.use('/api/entregas', entregasRoutes);
 app.use('/api/vendedores', vendedoresRoutes);
+app.use('/api/mensajes', mensajesRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {

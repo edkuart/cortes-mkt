@@ -17,6 +17,34 @@ const obtenerUsuarios = async (req, res) => {
   }
 };
 
+const cambiarContrasena = async (req, res) => {
+  const id = req.params.id;
+  const { nuevaContrasena } = req.body;
+  const usuarioAutenticado = req.usuario;
+
+  if (!nuevaContrasena || nuevaContrasena.length < 6) {
+    return res.status(400).json({ mensaje: 'La nueva contraseña debe tener al menos 6 caracteres.' });
+  }
+
+  if (parseInt(id) !== usuarioAutenticado.id) {
+    return res.status(403).json({ mensaje: 'No autorizado para cambiar esta contraseña.' });
+  }
+
+  try {
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+
+    const hash = await bcrypt.hash(nuevaContrasena, 10);
+    usuario.contraseña = hash;
+    await usuario.save();
+
+    res.json({ mensaje: 'Contraseña actualizada correctamente' });
+  } catch (error) {
+    console.error('Error al cambiar contraseña:', error);
+    res.status(500).json({ mensaje: 'Error interno del servidor' });
+  }
+};
+
 const actualizarPerfil = async (req, res) => {
   const id = req.params.id;
   const { nombreCompleto, correo, nuevaContraseña } = req.body;
@@ -38,18 +66,30 @@ const actualizarPerfil = async (req, res) => {
       usuario.contraseña = hash;
     }
 
-    // Manejo de imagen de perfil
     if (req.files && req.files.fotoPerfil) {
-      const nuevaRuta = path.join('uploads/perfiles', req.files.fotoPerfil[0].filename);
-
+      const archivo = req.files.fotoPerfil[0];
+      const extensionesPermitidas = ['.jpg', '.jpeg', '.png'];
+      const extension = path.extname(archivo.originalname).toLowerCase();
+      const tamañoMaximo = 2 * 1024 * 1024; // 2MB
+    
+      if (!extensionesPermitidas.includes(extension)) {
+        return res.status(400).json({ mensaje: 'Formato de imagen no permitido. Usa JPG o PNG.' });
+      }
+    
+      if (archivo.size > tamañoMaximo) {
+        return res.status(400).json({ mensaje: 'La imagen excede el tamaño máximo de 2MB.' });
+      }
+    
+      const nuevaRuta = path.join('uploads/perfiles', archivo.filename);
+    
       // Eliminar la antigua si existe
       if (usuario.fotoPerfil) {
         const rutaAnterior = path.join(__dirname, '..', usuario.fotoPerfil);
         if (fs.existsSync(rutaAnterior)) fs.unlinkSync(rutaAnterior);
       }
-
+    
       usuario.fotoPerfil = nuevaRuta;
-    }
+    }    
 
     // Si se solicita eliminar
     if (req.body.borrarFoto === 'true' && usuario.fotoPerfil) {
@@ -90,4 +130,5 @@ module.exports = {
   mostrarToken,
   loginDebug,
   obtenerUsuarios,
+  cambiarContrasena,
 };
