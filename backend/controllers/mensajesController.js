@@ -19,6 +19,18 @@ exports.obtenerMensajes = async (req, res) => {
       order: [['createdAt', 'ASC']],
     });
 
+    // ✅ Marcar como leídos los mensajes recibidos
+    await Mensaje.update(
+      { leido: true },
+      {
+        where: {
+          emisorId: receptorId,
+          receptorId: emisorId,
+          leido: false,
+        },
+      }
+    );
+
     res.json(mensajes);
   } catch (error) {
     console.error('❌ Error al obtener mensajes:', error);
@@ -41,6 +53,7 @@ exports.enviarMensaje = async (req, res) => {
       emisorId,
       receptorId,
       contenido,
+      leido: false
     });
 
     res.status(201).json(nuevoMensaje);
@@ -50,7 +63,7 @@ exports.enviarMensaje = async (req, res) => {
   }
 };
 
-// 🔎 Buscar vendedor y redirigir al chat
+// 🔎 Buscar vendedor y redirigir a contacto
 exports.iniciarConversacionConVendedor = async (req, res) => {
   const { productoId } = req.params;
 
@@ -61,7 +74,11 @@ exports.iniciarConversacionConVendedor = async (req, res) => {
     const vendedor = await Vendedor.findOne({ where: { id: producto.vendedorId } });
     if (!vendedor) return res.status(404).json({ mensaje: 'Vendedor no encontrado' });
 
-    res.json({ vendedorId: vendedor.usuarioId });
+    const usuario = await Usuario.findByPk(vendedor.usuarioId);
+    if (!usuario) return res.status(404).json({ mensaje: 'Usuario vendedor no encontrado' });
+
+    // 🧾 Lenguaje más claro: "Contacto con el vendedor"
+    res.json({ vendedorId: usuario.id, nombre: usuario.nombreCompleto, accion: 'Contacto con el vendedor' });
   } catch (error) {
     console.error('❌ Error al iniciar conversación:', error);
     res.status(500).json({ mensaje: 'Error al obtener vendedor' });
@@ -70,5 +87,53 @@ exports.iniciarConversacionConVendedor = async (req, res) => {
 
 // ✅ Nueva ruta auxiliar: para verificar conexión
 exports.pingMensajes = (req, res) => {
-  res.send('📬 Endpoint de mensajes operativo');
+  res.send('📨 Endpoint de mensajes operativo');
+};
+
+// 🟢 Obtener lista de conversaciones activas del usuario autenticado
+exports.obtenerConversaciones = async (req, res) => {
+  const usuarioId = req.usuario.id;
+
+  try {
+    const mensajes = await Mensaje.findAll({
+      where: {
+        [Op.or]: [
+          { emisorId: usuarioId },
+          { receptorId: usuarioId }
+        ]
+      },
+      order: [['createdAt', 'DESC']]
+    });
+
+    const conversacionesMap = new Map();
+
+    mensajes.forEach(m => {
+      const otro = m.emisorId === usuarioId ? m.receptorId : m.emisorId;
+      if (!conversacionesMap.has(otro)) {
+        conversacionesMap.set(otro, m);
+      }
+    });
+
+    const usuariosIds = Array.from(conversacionesMap.keys());
+    const usuarios = await Usuario.findAll({
+      where: { id: usuariosIds },
+      attributes: ['id', 'nombreCompleto']
+    });
+
+    const conversaciones = usuarios.map(u => {
+      const ultimoMensaje = conversacionesMap.get(u.id);
+      return {
+        id: u.id,
+        nombre: u.nombreCompleto,
+        ultimoMensaje: ultimoMensaje.contenido,
+        fecha: ultimoMensaje.createdAt,
+        leido: ultimoMensaje.receptorId !== usuarioId || ultimoMensaje.leido
+      };
+    });
+
+    res.json(conversaciones);
+  } catch (error) {
+    console.error('❌ Error al listar conversaciones:', error);
+    res.status(500).json({ mensaje: 'Error al obtener conversaciones' });
+  }
 };

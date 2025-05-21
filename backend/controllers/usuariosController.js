@@ -48,7 +48,7 @@ const cambiarContrasena = async (req, res) => {
 const actualizarPerfil = async (req, res) => {
   const id = req.params.id;
   const { nombreCompleto, correo, nuevaContraseña } = req.body;
-  const usuarioAutenticado = req.usuario; // viene del middleware con token
+  const usuarioAutenticado = req.usuario;
 
   if (parseInt(id) !== usuarioAutenticado.id) {
     return res.status(403).json({ mensaje: 'No autorizado para editar este perfil.' });
@@ -58,7 +58,6 @@ const actualizarPerfil = async (req, res) => {
     const usuario = await Usuario.findByPk(id);
     if (!usuario) return res.status(404).json({ mensaje: 'Usuario no encontrado' });
 
-    // Actualizar campos
     usuario.nombreCompleto = nombreCompleto;
     usuario.correo = correo;
     if (nuevaContraseña) {
@@ -70,28 +69,25 @@ const actualizarPerfil = async (req, res) => {
       const archivo = req.files.fotoPerfil[0];
       const extensionesPermitidas = ['.jpg', '.jpeg', '.png'];
       const extension = path.extname(archivo.originalname).toLowerCase();
-      const tamañoMaximo = 2 * 1024 * 1024; // 2MB
-    
+      const tamañoMaximo = 2 * 1024 * 1024;
+
       if (!extensionesPermitidas.includes(extension)) {
         return res.status(400).json({ mensaje: 'Formato de imagen no permitido. Usa JPG o PNG.' });
       }
-    
+
       if (archivo.size > tamañoMaximo) {
         return res.status(400).json({ mensaje: 'La imagen excede el tamaño máximo de 2MB.' });
       }
-    
+
       const nuevaRuta = path.join('uploads/perfiles', archivo.filename);
-    
-      // Eliminar la antigua si existe
       if (usuario.fotoPerfil) {
         const rutaAnterior = path.join(__dirname, '..', usuario.fotoPerfil);
         if (fs.existsSync(rutaAnterior)) fs.unlinkSync(rutaAnterior);
       }
-    
-      usuario.fotoPerfil = nuevaRuta;
-    }    
 
-    // Si se solicita eliminar
+      usuario.fotoPerfil = nuevaRuta;
+    }
+
     if (req.body.borrarFoto === 'true' && usuario.fotoPerfil) {
       const rutaFoto = path.join(__dirname, '..', usuario.fotoPerfil);
       if (fs.existsSync(rutaFoto)) fs.unlinkSync(rutaFoto);
@@ -106,19 +102,16 @@ const actualizarPerfil = async (req, res) => {
         fotoUrl
       }
     });
-
   } catch (error) {
     console.error('Error al actualizar perfil:', error);
     res.status(500).json({ mensaje: 'Error interno del servidor' });
   }
 };
 
-// 🧪 DEBUG: Mostrar token generado en login o loginConGoogle
 const mostrarToken = (token) => {
   console.log('🔐 Token JWT generado:', token);
 };
 
-// ✅ Función para devolver token en pruebas desde login
 const loginDebug = async (req, res) => {
   const token = req.body.token || 'TOKEN_NO_PROPORCIONADO';
   mostrarToken(token);
@@ -130,5 +123,5 @@ module.exports = {
   mostrarToken,
   loginDebug,
   obtenerUsuarios,
-  cambiarContrasena,
+  cambiarContrasena
 };

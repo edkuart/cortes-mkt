@@ -25,40 +25,66 @@ Este proyecto representa el backend de un marketplace modular creado con **Node.
 
 ```
 backend/
-├── server.js
-├── database.sqlite
-├── package.json
-├── .env
+├── server.js                         # 🚀 Servidor principal Express
+├── database.sqlite                   # 🗂 Base de datos SQLite
+├── package.json                      # 📦 Configuración del proyecto
+├── .env                              # 🔐 Variables de entorno
+│
 ├── config/
-│   └── db.js
+│   └── db.js                         # ⚙️ Configuración de Sequelize
+│
 ├── controllers/
-│   ├── authController.js
-│   ├── pedidosController.js
-│   ├── productosController.js
-│   ├── resenasController.js
-│   ├── devolucionesController.js
-│   └── notificacionesController.js
+│   ├── aiController.js              # 🤖 Lógica para IA
+│   ├── authController.js            # 🔐 Login y registro tradicional
+│   ├── authGoogleController.js      # 🔐 Login con Google OAuth
+│   ├── devolucionesController.js    # 📦 Controlador de devoluciones
+│   ├── entregasController.js        # 🚚 Controlador de entregas
+│   ├── historialController.js       # 📜 Obtener historial de cambios de producto
+│   ├── mensajesController.js        # 💬 Mensajes entre usuarios
+│   ├── notificacionesController.js  # 🔔 Lógica para enviar notificaciones (ej: por email)
+│   ├── pedidosController.js         # 📥 Controlador de pedidos
+│   ├── productosController.js       # 🛍 Controlador principal de productos
+│   ├── resenasController.js         # ✍️ Controlador de reseñas
+│   ├── usuariosController.js        # 👤 Perfil, cambio de datos y contraseña
+│   └── vendedoresController.js      # 🧑‍💼 Controlador del panel vendedor
+│
+├── middleware/
+│   ├── authMiddleware.js            # 🔐 Protege rutas según rol
+│   ├── uploadMiddleware.js          # 📤 Multer para imágenes
+│   └── verificarToken.js            # ✅ Verifica JWT y pasa `req.usuario`
+│
 ├── models/
-│   ├── index.js
-│   ├── detallePedido.model.js
-│   ├── interaccionIA.model.js
-│   ├── pedido.model.js
-│   ├── producto.model.js
-│   ├── resena.model.js
-│   ├── usuario.model.js
-│   ├── devolucion.model.js
-│   └── vendedor.model.js
+│   ├── index.js                     # 🔗 Inicializa Sequelize y relaciones
+│   ├── detallePedido.model.js       # 📦 Detalles de productos por pedido
+│   ├── devolucion.js                # 🔁 Modelo de devoluciones
+│   ├── entrega.model.js             # 🚚 Modelo de entregas
+│   ├── historialProducto.js         # 📝 Modelo para registrar cambios de productos
+│   ├── interaccionIA.model.js       # 🧠 Interacciones con la IA
+│   ├── mensaje.model.js             # 💬 Mensajes entre usuarios
+│   ├── pedido.model.js              # 🛒 Pedidos
+│   ├── producto.model.js            # 🛍 Productos en venta
+│   ├── rankingVendedor.model.js     # 🏅 Métricas de vendedor
+│   ├── resena.model.js              # ✍️ Opiniones de productos
+│   ├── usuario.model.js             # 👤 Usuarios base
+│   └── vendedor.model.js            # 🧑‍💼 Datos adicionales para vendedores
+│
 ├── routes/
-│   ├── ai.routes.js
-│   ├── authRoutes.js
-│   ├── pedidosRoutes.js
-│   ├── productosRoutes.js
-│   ├── resenasRoutes.js
-│   ├── devolucionesRoutes.js
-│   └── notificacionesRoutes.js
+│   ├── ai.routes.js                 # 🔀 Ruta para IA
+│   ├── authRoutes.js                # 🔀 Login y registro
+│   ├── pedidosRoutes.js             # 🔀 Rutas de pedidos
+│   ├── productosRoutes.js           # 🔀 Rutas de productos
+│   ├── resenasRoutes.js             # 🔀 Rutas de reseñas
+│   ├── devolucionesRoutes.js        # 🔀 Devoluciones
+│   ├── notificacionesRoutes.js      # 🔀 Notificaciones (email, etc)
+│   └── mensajesRoutes.js            # 🔀 Chat y conversaciones
+│
 ├── services/
-│   ├── aiService.js
-│   └── openaiClient.js
+│   ├── aiService.js                 # 🤖 Integración de IA
+│   └── openaiClient.js              # 🔑 Configuración OpenAI
+│
+├── migrations/                      # 🧬 (opcional) Migraciones futuras si decides usar CLI
+├── node_modules/
+└── tests/                           # 🧪 (opcional) Tests unitarios o integrados
 
 ```
 
@@ -167,6 +193,8 @@ npm run dev
 
     POST /api/usuarios
 
+    PATCH /api/usuarios/:id
+
 📦 Productos
 
     GET /api/productos
@@ -238,7 +266,9 @@ sequelize.sync({ force: true })
 - 📊 **Ranking e historial de calificaciones**
 - ✅ **Control por rol (comprador vs. vendedor)**
 - 🔐 **Login con Google integrado (OAuth 2.0)**
-
++ Campo fotoPerfil y fotoUrl en respuesta de usuario
++ Middleware verificarToken (para rutas protegidas)
++ Ruta pública para imágenes uploads/perfiles (servida desde Express)
 ---
 
 📬 Contacto

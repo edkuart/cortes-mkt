@@ -19,6 +19,7 @@ const VendedorModel = require('./vendedor.model');
 const DetallePedidoModel = require('./detallePedido.model');
 const DevolucionModel = require('./devolucion');
 const RankingVendedorModel = require('./rankingVendedor.model');
+const HistorialProductoModel = require('./historialProducto');
 
 // ✅ Inicializar modelos
 const Pedido = PedidoModel(sequelize, DataTypes);
@@ -31,6 +32,7 @@ const Vendedor = VendedorModel(sequelize, DataTypes);
 const DetallePedido = DetallePedidoModel(sequelize, DataTypes);
 const Devolucion = DevolucionModel(sequelize, DataTypes);
 const RankingVendedor = RankingVendedorModel(sequelize, DataTypes);
+const HistorialProducto = HistorialProductoModel(sequelize, DataTypes);
 
 console.log("🗂 Base de datos usada:", sequelize.options.storage);
 
@@ -77,6 +79,7 @@ module.exports = {
   Vendedor,
   DetallePedido,
   Devolucion,
-  RankingVendedor
+  RankingVendedor,
+  HistorialProducto
 };
 

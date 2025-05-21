@@ -9,14 +9,17 @@ const {
   crearDevolucion,
 } = require('../controllers/devolucionesController');
 
-const { verificarToken } = require('../middleware/authMiddleware'); // ✅ Importar el middleware
+const { verificarToken, verificarRol } = require('../middleware/authMiddleware');
 
-// 🟢 Rutas protegidas por JWT
-router.get('/', verificarToken, obtenerDevoluciones);
+// 🟢 Rutas protegidas por JWT + Rol vendedor
+router.get('/', verificarToken, verificarRol('vendedor'), obtenerDevoluciones);
+router.patch('/:id/aceptar', verificarToken, verificarRol('vendedor'), aceptarDevolucion);
+router.patch('/:id/rechazar', verificarToken, verificarRol('vendedor'), rechazarDevolucion);
+
+// 🟡 Ruta para compradores (solo necesita estar autenticado)
 router.post('/', verificarToken, crearDevolucion);
-router.patch('/:id/aceptar', verificarToken, aceptarDevolucion);
-router.patch('/:id/rechazar', verificarToken, rechazarDevolucion);
 
 module.exports = router;
+
 
 

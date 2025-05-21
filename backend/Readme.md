@@ -1,4 +1,4 @@
-# 📝 Guía rápida para crear una reseña funcional (con datos válidos)
+# 📜 Guía rápida para probar reseñas y mensajes
 
 ## 1. Crear usuario comprador
 ```js
@@ -50,12 +50,19 @@ await Pedido.create({
 ```
 
 ## 5. Generar token JWT para comprador
-Usar el token resultante del login para autenticar.
+- Inicia sesión desde el frontend o endpoint de login
+- Copia el token devuelto
+
+```bash
+TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+---
 
 ## 6. Crear reseña con cURL
 ```bash
 curl -X POST http://localhost:4000/api/resenas \
-  -H "Authorization: Bearer TU_TOKEN" \
+  -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "vendedorId": ID_VENDEDOR,
@@ -65,18 +72,43 @@ curl -X POST http://localhost:4000/api/resenas \
     "calificacion": 5
   }'
 ```
-## 7. actualizar la imagen de perfil del vendedor
+
+---
+
+## 7. Enviar mensaje al vendedor (nuevo módulo 💬)
 ```bash
-curl -X PATCH http://localhost:4000/api/usuarios/:id \
-  -H "Authorization: Bearer TU_TOKEN" \
+curl -X POST http://localhost:4000/api/mensajes \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "receptorId": ID_VENDEDOR,
+    "contenido": "¡Hola! ¿Tienes más productos disponibles?"
+  }'
+```
+
+## 8. Ver historial de mensajes
+```bash
+curl http://localhost:4000/api/mensajes/ID_VENDEDOR \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+---
+
+## 9. Actualizar foto de perfil del vendedor
+```bash
+curl -X PATCH http://localhost:4000/api/usuarios/ID_VENDEDOR \
+  -H "Authorization: Bearer $TOKEN" \
   -F "nombreCompleto=Nuevo Nombre" \
   -F "correo=nuevo@correo.com" \
   -F "fotoPerfil=@/ruta/a/la/imagen.jpg"
+```
+
 ---
 
 ## ✅ Requisitos clave para que funcione
 
-- `vendedorId` y `productoId` deben **existir** y estar relacionados.
-- `pedidoId` debe existir y estar **asociado al comprador logueado**.
-- El comprador **no debe haber dejado una reseña previa** para ese `pedidoId`.
-- El token JWT debe ser válido y pertenecer a un **comprador**.
+- `vendedorId`, `productoId` deben **existir** y estar **relacionados**.
+- `pedidoId` debe estar **asociado al comprador logueado**.
+- No debe haber una reseña previa para ese `pedidoId`.
+- El token JWT debe ser válido y de un usuario **rol: comprador**.
+- Para mensajes, tanto `emisorId` como `receptorId` deben existir.

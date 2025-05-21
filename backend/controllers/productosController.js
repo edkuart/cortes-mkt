@@ -1,10 +1,9 @@
 // backend/controllers/productosController.js
 
 const Pedido = require('../models/pedido.model');
-const { Producto, Resena } = require('../models');
+const { Producto, Resena, HistorialProducto } = require('../models');
 const { Op } = require('sequelize');
 
-// Crear nuevo pedido
 const crearPedido = async (req, res) => {
   try {
     const { compradorId, productos } = req.body;
@@ -98,7 +97,6 @@ const crearProducto = async (req, res) => {
   }
 };
 
-
 const obtenerProductoPorId = async (req, res) => {
   try {
     const { id } = req.params;
@@ -117,21 +115,51 @@ const actualizarProducto = async (req, res) => {
     const producto = await Producto.findByPk(id);
     if (!producto) return res.status(404).json({ mensaje: 'Producto no encontrado' });
 
-    const camposActualizados = {
-      nombre: req.body.nombre || producto.nombre,
-      descripcion: req.body.descripcion || producto.descripcion,
-      precio: req.body.precio || producto.precio,
-      stock: req.body.stock || producto.stock,
-      categoria: req.body.categoria || producto.categoria,
-      vendedorId: req.body.vendedorId || producto.vendedorId
-    };
+    const cambios = [];
+    const campos = ['nombre', 'descripcion', 'precio', 'stock', 'categoria', 'vendedorId'];
 
-    if (req.file) {
-      camposActualizados.imagen = req.file.path;
+    for (const campo of campos) {
+      if (req.body[campo] !== undefined && req.body[campo] != producto[campo]) {
+        cambios.push({
+          productoId: producto.id,
+          campo,
+          valorAnterior: String(producto[campo]),
+          valorNuevo: String(req.body[campo])
+        });
+        producto[campo] = req.body[campo];
+      }
     }
 
-    await producto.update(camposActualizados);
-    res.json(producto);
+    if (req.file && req.file.path !== producto.imagen) {
+      cambios.push({
+        productoId: producto.id,
+        campo: 'imagen',
+        valorAnterior: String(producto.imagen),
+        valorNuevo: String(req.file.path)
+      });
+      producto.imagen = req.file.path;
+    }
+
+    await producto.save();
+
+    const usuario = req.usuario?.nombreCompleto || 'Desconocido';
+
+    let historialGuardado = [];
+    if (cambios.length > 0) {
+      historialGuardado = await Promise.all(cambios.map(async (c) => {
+        return await HistorialProducto.create({
+          productoId: c.productoId,
+          campo: c.campo,
+          valorAnterior: c.valorAnterior,
+          valorNuevo: c.valorNuevo,
+          usuarioNombre: usuario,
+          imagenAnterior: c.campo === 'imagen' ? `http://localhost:4000/${c.valorAnterior}` : null,
+          imagenNueva: c.campo === 'imagen' ? `http://localhost:4000/${c.valorNuevo}` : null
+        });
+      }));
+    }
+
+    res.json({ producto, historial: historialGuardado });
   } catch (error) {
     console.error('Error al actualizar producto:', error);
     res.status(500).json({ mensaje: 'Error al actualizar producto' });
