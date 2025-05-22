@@ -21,7 +21,7 @@ router.post(
     vendedoresController.solicitarVendedor
   );
 
-router.get('/:id/ranking', vendedoresController.obtenerRankingVendedor);
+router.get('/:id/ranking', verificarToken, vendedoresController.obtenerRankingVendedor);
   
 module.exports = router;
 
