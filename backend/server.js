@@ -3,14 +3,17 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const { setupSwagger } = require('./swagger'); // 🧭 Swagger importado
 
 const app = express();
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
-
 app.use('/uploads', express.static('uploads'));
+
+// Swagger Docs habilitado en /api-docs
+setupSwagger(app); // 🧭 Swagger activado
 
 // Luego ya tus rutas:
 const devolucionesRoutes = require('./routes/devolucionesRoutes');
@@ -30,13 +33,11 @@ app.get('/debug/crear-pedido', async (req, res) => {
   res.json(nuevo);
 });
 
-// ✅ Ruta corregida: ahora está fuera de la anterior
 app.get('/debug/crear-usuario', async (req, res) => {
   const { Usuario, Vendedor } = require('./models');
   const bcrypt = require('bcryptjs');
 
   try {
-    // Buscar si ya existe por correo
     const existente = await Usuario.findOne({ where: { correo: 'test@correo.com' } });
 
     if (existente) {
@@ -105,7 +106,6 @@ const mensajesRoutes = require('./routes/mensajesRoutes');
 const historialRoutes = require('./routes/historialRoutes');
 const debugRoutes = require('./routes/debugRoutes');
 
-// Usar rutas
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
 app.use('/api/auth', authRoutes);
@@ -140,7 +140,6 @@ sequelize.sync({ force: true })
   .then(async () => {
     console.log("🟢 Base de datos sincronizada correctamente");
 
-    // 👀 Verificar que la tabla productos tenga promedioCalificacion
     const estructura = await sequelize.getQueryInterface().describeTable('productos');
     console.log("📊 Estructura de la tabla productos:");
     console.table(estructura);
@@ -153,6 +152,7 @@ sequelize.sync({ force: true })
 
     const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+      console.log(`📘 Swagger disponible en http://localhost:${PORT}/api-docs`);
 
       try {
         const rutas = app._router?.stack
@@ -170,5 +170,3 @@ sequelize.sync({ force: true })
   .catch((error) => {
     console.error("🔴 Error al sincronizar la base de datos:", error);
   });
-
-

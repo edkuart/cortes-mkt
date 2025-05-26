@@ -87,6 +87,8 @@ exports.loginConGoogle = async (req, res) => {
   const { credential } = req.body;
 
   try {
+    console.log('🔎 clientId del backend:', process.env.GOOGLE_CLIENT_ID);
+
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
