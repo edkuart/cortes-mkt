@@ -15,6 +15,9 @@ app.use('/uploads', express.static('uploads'));
 // Swagger Docs habilitado en /api-docs
 setupSwagger(app); // 🧭 Swagger activado
 
+const favoritosRoutes = require('./routes/favoritosRoutes');
+app.use('/api/favoritos', favoritosRoutes);
+
 // Luego ya tus rutas:
 const devolucionesRoutes = require('./routes/devolucionesRoutes');
 app.use('/api/devoluciones', devolucionesRoutes);
@@ -54,14 +57,23 @@ app.get('/debug/crear-usuario', async (req, res) => {
     });
 
     const nuevoVendedor = await Vendedor.create({
-      usuarioId: nuevoUsuario.id
+      usuarioId: nuevoUsuario.id,
+      telefono: '12345678',
+      direccion: 'Zona 1, Xela',
+      municipio: 'Quetzaltenango',
+      departamento: 'Quetzaltenango',
+      estado: 'pendiente'
     });
 
-    res.status(201).json({ mensaje: '✅ Usuario y vendedor creados', usuario: nuevoUsuario, vendedor: nuevoVendedor });
+    res.status(201).json({
+      mensaje: '✅ Usuario y vendedor creados',
+      usuario: nuevoUsuario,
+      vendedor: nuevoVendedor
+    });
 
   } catch (error) {
     console.error('❌ Error al crear usuario y vendedor:', error);
-    res.status(500).json({ mensaje: 'Error al crear usuario y vendedor' });
+    res.status(500).json({ mensaje: 'Error al crear usuario y vendedor', error });
   }
 });
 

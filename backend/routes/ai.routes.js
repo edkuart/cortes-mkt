@@ -1,12 +1,13 @@
-// backend/routes/ai.routes.js
+// 📁 backend/routes/ai.routes.js
 
 const express = require("express");
 const router = express.Router();
 const {
   generateCompletion,
   generarRecomendaciones,
+  descripcionAtractivaProducto
 } = require("../services/aiService");
-const { InteraccionIA } = require("../models");
+const { InteraccionIA, Producto } = require("../models");
 
 const usarOpenAI = process.env.USE_OPENAI === "true";
 
@@ -26,6 +27,28 @@ router.post("/", async (req, res) => {
   } catch (err) {
     console.error("❌ Error en /api/ia:", err.message);
     res.status(500).json({ error: "Error al procesar la solicitud de IA." });
+  }
+});
+
+// POST /api/ia/descripcion-producto
+router.post("/descripcion-producto", async (req, res) => {
+  const { productoId } = req.body;
+
+  if (!productoId) {
+    return res.status(400).json({ error: "ID del producto requerido" });
+  }
+
+  try {
+    const producto = await Producto.findByPk(productoId);
+    if (!producto) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+
+    const descripcion = await descripcionAtractivaProducto(producto);
+    res.json({ descripcion });
+  } catch (err) {
+    console.error("❌ Error en /descripcion-producto:", err.message);
+    res.status(500).json({ error: "Error generando descripción" });
   }
 });
 

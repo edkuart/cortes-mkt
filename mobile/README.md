@@ -40,7 +40,7 @@ mobile/
 │   └── api.js
 └── assets/
 ```
-
+🛡 En producción, usá HTTPS y un dominio real para el API_URL.
 ---
 
 ## ⚙️ Configuración Inicial
@@ -54,7 +54,8 @@ npm install
 2. Crear archivo `.env`:
 
 ```env
-API_URL=http://192.168.1.173:4000
+API_URL=http://192.168.1.100:4000
+
 ```
 
 > ⚠️ Reemplazá la IP por la IP de tu servidor si estás en red local.
@@ -74,7 +75,7 @@ npx expo start --clear
 - Autenticación con JWT
 - Restauración de sesión desde AsyncStorage
 - Redirección automática al dashboard según el rol
-- Vista de pedidos del vendedor (token protegido)
+- Vista de pedidos del comprador y vendedor, protegida con token JWT
 - Vista de devoluciones con botones para aceptar/rechazar
 - Vista de detalle del pedido con productos, totales y estado
 - Vista de reseñas con nombre del cliente, comentario, calificación y fecha

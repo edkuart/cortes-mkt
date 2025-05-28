@@ -2,6 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
+const { crearVendedor } = require('../controllers/vendedoresController');
 const vendedoresController = require('../controllers/vendedoresController');
 const { verificarToken } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
@@ -22,6 +23,8 @@ router.post(
   );
 
 router.get('/:id/ranking', verificarToken, vendedoresController.obtenerRankingVendedor);
+
+router.post('/crear', verificarToken, crearVendedor);
   
 module.exports = router;
 

@@ -1,13 +1,12 @@
-// 🧠 controllers/aiController.js - Maneja solicitudes de IA desde el frontend
+// 🧠 controllers/aiController.js
 
-const express = require('express');
-const router = express.Router();
-const { generateCompletion } = require('../services/aiService');
+const { Producto } = require('../models');
+const { generateCompletion, descripcionAtractivaProducto } = require('../services/aiService');
 
-// Ruta POST para generar respuesta de IA
-router.post('/ia', async (req, res) => {
+// Ruta POST tradicional para texto libre
+exports.generarRespuestaLibre = async (req, res) => {
   const { prompt } = req.body;
-  console.log("Prompt recibido:", prompt); // Agregar un log para depurar
+  console.log("Prompt recibido:", prompt);
 
   if (!prompt) {
     return res.status(400).json({ error: 'Prompt requerido' });
@@ -15,13 +14,28 @@ router.post('/ia', async (req, res) => {
 
   try {
     const resultado = await generateCompletion(prompt);
-    console.log("Respuesta generada:", resultado); // Log para ver la respuesta generada
+    console.log("Respuesta generada:", resultado);
     res.json({ respuesta: resultado });
   } catch (err) {
     console.error("Error al generar respuesta:", err.message);
     res.status(500).json({ error: 'Error al generar respuesta de IA' });
   }
-});
+};
 
+// Ruta POST para generar descripción atractiva de producto
+exports.generarDescripcionProducto = async (req, res) => {
+  try {
+    const { productoId } = req.body;
+    const producto = await Producto.findByPk(productoId);
 
-module.exports = router;
+    if (!producto) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+
+    const descripcion = await descripcionAtractivaProducto(producto);
+    res.json({ descripcion });
+  } catch (err) {
+    console.error('Error al generar descripción IA:', err.message);
+    res.status(500).json({ error: 'Error generando descripción del producto' });
+  }
+};

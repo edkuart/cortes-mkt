@@ -20,6 +20,7 @@ const DetallePedidoModel = require('./detallePedido.model');
 const DevolucionModel = require('./devolucion');
 const RankingVendedorModel = require('./rankingVendedor.model');
 const HistorialProductoModel = require('./historialProducto');
+const FavoritoModel = require('./favorito.model');
 
 // ✅ Inicializar modelos
 const Pedido = PedidoModel(sequelize, DataTypes);
@@ -33,6 +34,7 @@ const DetallePedido = DetallePedidoModel(sequelize, DataTypes);
 const Devolucion = DevolucionModel(sequelize, DataTypes);
 const RankingVendedor = RankingVendedorModel(sequelize, DataTypes);
 const HistorialProducto = HistorialProductoModel(sequelize, DataTypes);
+const Favorito = FavoritoModel(sequelize, DataTypes);
 
 console.log("🗂 Base de datos usada:", sequelize.options.storage);
 
@@ -48,7 +50,6 @@ Devolucion.associate?.({ Pedido });
 RankingVendedor.associate?.({ Vendedor });
 
 // ✅ Asociaciones manuales (en caso de no estar en los models)
-
 RankingVendedor.belongsTo(Vendedor, { foreignKey: 'vendedorId' });
 Vendedor.hasOne(RankingVendedor, { foreignKey: 'vendedorId' });
 
@@ -67,6 +68,8 @@ DetallePedido.belongsTo(Pedido, { foreignKey: 'pedidoId' });
 Devolucion.belongsTo(Pedido, { foreignKey: 'pedidoId' });
 Pedido.hasMany(Devolucion, { foreignKey: 'pedidoId' });
 
+Favorito.belongsTo(Producto, { foreignKey: 'productoId' });
+
 // ✅ Exportar modelos
 module.exports = {
   sequelize,
@@ -80,6 +83,7 @@ module.exports = {
   DetallePedido,
   Devolucion,
   RankingVendedor,
-  HistorialProducto
+  HistorialProducto,
+  Favorito
 };
 

@@ -32,6 +32,24 @@ function filtrarCortes(preferencia, cortes) {
   return cortes.filter(c => c.nombre.toLowerCase().includes(preferencia.toLowerCase()));
 }
 
+async function descripcionAtractivaProducto(producto) {
+  const prompt = `Describe de forma atractiva y creativa un producto con las siguientes características:
+Nombre: ${producto.nombre}
+Descripción: ${producto.descripcion}
+Categoría: ${producto.categoria}
+
+Devuelve una sola frase atractiva de recomendación.`;
+
+  const respuesta = await generateCompletion(prompt);
+
+  await InteraccionIA.create({
+    prompt,
+    respuesta,
+  });
+
+  return respuesta;
+}
+
 async function generarRecomendaciones(preferencia) {
   const cortes = [
     { id: 1, nombre: "Corte tradicional de Totonicapán", precio: 250 },
@@ -53,6 +71,5 @@ async function generarRecomendaciones(preferencia) {
 module.exports = {
   generateCompletion,
   generarRecomendaciones,
+  descripcionAtractivaProducto
 };
-
-
