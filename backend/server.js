@@ -117,6 +117,7 @@ const vendedoresRoutes = require('./routes/vendedoresRoutes');
 const mensajesRoutes = require('./routes/mensajesRoutes');
 const historialRoutes = require('./routes/historialRoutes');
 const debugRoutes = require('./routes/debugRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
@@ -129,7 +130,7 @@ app.use('/api/vendedores', vendedoresRoutes);
 app.use('/api/mensajes', mensajesRoutes);
 app.use('/api/historial', historialRoutes);
 app.use('/debug', debugRoutes);
-
+app.use('/api/admin', adminRoutes);
 // Ruta de prueba
 app.get('/', (req, res) => {
   res.send('🚀 Bienvenido al Marketplace Modular Backend');
@@ -182,3 +183,9 @@ sequelize.sync({ force: true })
   .catch((error) => {
     console.error("🔴 Error al sincronizar la base de datos:", error);
   });
+
+const db = require('./models');
+
+db.sequelize.sync({ force: true }).then(() => {
+  console.log('🔁 Base de datos recreada correctamente');
+});

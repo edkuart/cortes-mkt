@@ -3,7 +3,7 @@
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET || 'clave_secreta';
 
-exports.verificarToken = (req, res, next) => {
+const verificarToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader?.split(' ')[1] || authHeader;
 
@@ -25,7 +25,7 @@ exports.verificarToken = (req, res, next) => {
   }
 };
 
-exports.verificarRol = (rolRequerido) => {
+const verificarRol = (rolRequerido) => {
   return (req, res, next) => {
     const usuario = req.usuario;
     if (!usuario || usuario.rol !== rolRequerido) {
@@ -33,4 +33,20 @@ exports.verificarRol = (rolRequerido) => {
     }
     next();
   };
+};
+
+const authMiddleware = (rolesPermitidos = []) => {
+  return (req, res, next) => {
+    const usuario = req.usuario;
+    if (!usuario || !rolesPermitidos.includes(usuario.rol)) {
+      return res.status(403).json({ mensaje: 'Acceso denegado. Rol no autorizado.' });
+    }
+    next();
+  };
+};
+
+module.exports = {
+  verificarToken,
+  verificarRol,
+  authMiddleware,
 };

@@ -21,6 +21,7 @@ const DevolucionModel = require('./devolucion');
 const RankingVendedorModel = require('./rankingVendedor.model');
 const HistorialProductoModel = require('./historialProducto');
 const FavoritoModel = require('./favorito.model');
+const MensajeModel = require('./mensaje.model');
 
 // ✅ Inicializar modelos
 const Pedido = PedidoModel(sequelize, DataTypes);
@@ -35,8 +36,18 @@ const Devolucion = DevolucionModel(sequelize, DataTypes);
 const RankingVendedor = RankingVendedorModel(sequelize, DataTypes);
 const HistorialProducto = HistorialProductoModel(sequelize, DataTypes);
 const Favorito = FavoritoModel(sequelize, DataTypes);
+const Mensaje = MensajeModel(sequelize, DataTypes);
 
 console.log("🗂 Base de datos usada:", sequelize.options.storage);
+
+// ✅ Definir objeto db
+const db = {};
+
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+
+// ✅ Cargar modelos adicionales
+db.Reporte = require('./reporte')(sequelize, Sequelize.DataTypes);
 
 // ✅ Asociaciones automáticas protegidas
 Pedido.associate?.({ Usuario, DetallePedido, Entrega, Devolucion });
@@ -84,6 +95,7 @@ module.exports = {
   Devolucion,
   RankingVendedor,
   HistorialProducto,
-  Favorito
+  Favorito,
+  Mensaje,
 };
 

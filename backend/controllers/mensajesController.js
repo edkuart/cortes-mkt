@@ -5,8 +5,16 @@ const { Op } = require('sequelize');
 
 // 📩 Obtener todos los mensajes entre el usuario autenticado y otro usuario
 exports.obtenerMensajes = async (req, res) => {
-  const emisorId = req.usuario.id;
-  const receptorId = parseInt(req.params.otroUsuarioId);
+  const emisorId = req.usuario?.id;
+  const receptorIdRaw = req.params.otroUsuarioId;
+  const receptorId = parseInt(receptorIdRaw);
+
+  console.log('🧪 Param recibido:', receptorIdRaw);
+  console.log('👤 Usuario autenticado:', emisorId);
+
+  if (!receptorIdRaw || isNaN(receptorId) || !emisorId) {
+    return res.status(400).json({ mensaje: 'ID de receptor inválido (NaN)' });
+  }
 
   try {
     const mensajes = await Mensaje.findAll({
