@@ -1,101 +1,98 @@
-//backend/models/index.js
+// backend/models/index.js
 
 const { Sequelize, DataTypes } = require('sequelize');
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: './database.sqlite',
-  logging: false,
+  logging: false, // Puedes poner true temporalmente para ver las queries SQL en la consola del backend
 });
 
-// ✅ Importar modelos
-const PedidoModel = require('./pedido.model');
-const ProductoModel = require('./producto.model');
-const ResenaModel = require('./resena.model');
-const UsuarioModel = require('./usuario.model');
-const InteraccionIAModel = require('./interaccionIA.model');
-const EntregaModel = require('./entrega.model');
-const VendedorModel = require('./vendedor.model');
-const DetallePedidoModel = require('./detallePedido.model');
-const DevolucionModel = require('./devolucion');
-const RankingVendedorModel = require('./rankingVendedor.model');
-const HistorialProductoModel = require('./historialProducto');
-const FavoritoModel = require('./favorito.model');
-const MensajeModel = require('./mensaje.model');
+// ✅ Importar modelos (definiciones de funciones)
+const PedidoModelFunc = require('./pedido.model');
+const ProductoModelFunc = require('./producto.model');
+const ResenaModelFunc = require('./resena.model');
+const UsuarioModelFunc = require('./usuario.model');
+const InteraccionIAModelFunc = require('./interaccionIA.model');
+const EntregaModelFunc = require('./entrega.model');
+const VendedorModelFunc = require('./vendedor.model');
+const DetallePedidoModelFunc = require('./detallePedido.model');
+const DevolucionModelFunc = require('./devolucion');
+const RankingVendedorModelFunc = require('./rankingVendedor.model');
+const HistorialProductoModelFunc = require('./historialProducto');
+const FavoritoModelFunc = require('./favorito.model');
+const MensajeModelFunc = require('./mensaje.model');
+const ReporteModelFunc = require('./reporte'); // --- CAMBIO AQUÍ --- Importar la función del modelo Reporte
 
-// ✅ Inicializar modelos
-const Pedido = PedidoModel(sequelize, DataTypes);
-const Producto = ProductoModel(sequelize, DataTypes);
-const Resena = ResenaModel(sequelize, DataTypes);
-const Usuario = UsuarioModel(sequelize, DataTypes);
-const InteraccionIA = InteraccionIAModel(sequelize, DataTypes);
-const Entrega = EntregaModel(sequelize, DataTypes);
-const Vendedor = VendedorModel(sequelize, DataTypes);
-const DetallePedido = DetallePedidoModel(sequelize, DataTypes);
-const Devolucion = DevolucionModel(sequelize, DataTypes);
-const RankingVendedor = RankingVendedorModel(sequelize, DataTypes);
-const HistorialProducto = HistorialProductoModel(sequelize, DataTypes);
-const Favorito = FavoritoModel(sequelize, DataTypes);
-const Mensaje = MensajeModel(sequelize, DataTypes);
-
-console.log("🗂 Base de datos usada:", sequelize.options.storage);
-
-// ✅ Definir objeto db
+// ✅ Inicializar modelos y guardarlos en un objeto 'db' para pasarlos a las asociaciones
 const db = {};
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-// ✅ Cargar modelos adicionales
-db.Reporte = require('./reporte')(sequelize, Sequelize.DataTypes);
+db.Pedido = PedidoModelFunc(sequelize, DataTypes);
+db.Producto = ProductoModelFunc(sequelize, DataTypes);
+db.Resena = ResenaModelFunc(sequelize, DataTypes);
+db.Usuario = UsuarioModelFunc(sequelize, DataTypes);
+db.InteraccionIA = InteraccionIAModelFunc(sequelize, DataTypes);
+db.Entrega = EntregaModelFunc(sequelize, DataTypes);
+db.Vendedor = VendedorModelFunc(sequelize, DataTypes);
+db.DetallePedido = DetallePedidoModelFunc(sequelize, DataTypes);
+db.Devolucion = DevolucionModelFunc(sequelize, DataTypes);
+db.RankingVendedor = RankingVendedorModelFunc(sequelize, DataTypes);
+db.HistorialProducto = HistorialProductoModelFunc(sequelize, DataTypes);
+db.Favorito = FavoritoModelFunc(sequelize, DataTypes);
+db.Mensaje = MensajeModelFunc(sequelize, DataTypes);
+db.Reporte = ReporteModelFunc(sequelize, DataTypes); // --- CAMBIO AQUÍ --- Inicializar Reporte y guardarlo en db
 
-// ✅ Asociaciones automáticas protegidas
-Pedido.associate?.({ Usuario, DetallePedido, Entrega, Devolucion });
-Producto.associate?.({ Resena, Vendedor });
-Resena.associate?.({ Usuario, Producto });
-Vendedor.associate?.({ Usuario, Producto, RankingVendedor });
-Entrega.associate?.({ Pedido });
-Usuario.associate?.({ Vendedor });
-DetallePedido.associate?.({ Pedido, Producto });
-Devolucion.associate?.({ Pedido });
-RankingVendedor.associate?.({ Vendedor });
+console.log("🗂 Base de datos usada:", sequelize.options.storage);
 
-// ✅ Asociaciones manuales (en caso de no estar en los models)
-RankingVendedor.belongsTo(Vendedor, { foreignKey: 'vendedorId' });
-Vendedor.hasOne(RankingVendedor, { foreignKey: 'vendedorId' });
 
-Producto.belongsTo(Vendedor, { foreignKey: 'vendedorId' });
-Vendedor.hasMany(Producto, { foreignKey: 'vendedorId' });
+// ✅ Llamar a las funciones de asociación de cada modelo
+// Es una buena práctica iterar sobre los modelos en `db` y llamar a `associate` si existe.
+Object.keys(db).forEach(modelName => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db); // --- CAMBIO AQUÍ --- Llamada general a las asociaciones
+  }
+});
 
-Vendedor.belongsTo(Usuario, { foreignKey: 'usuarioId' });
-Usuario.hasOne(Vendedor, { foreignKey: 'usuarioId' });
+// Las asociaciones manuales que tenías podrían ser redundantes si las defines
+// correctamente dentro de los métodos `associate` de cada modelo.
+// Si las mantienes, asegúrate de que no entren en conflicto.
+// Por ejemplo, Reporte.associate ya define Reporte.belongsTo(Usuario).
 
-Entrega.belongsTo(Pedido, { foreignKey: 'pedidoId' });
-Pedido.hasOne(Entrega, { foreignKey: 'pedidoId' });
+/* // Ejemplo de tus asociaciones manuales (revisar si son necesarias después de llamar a .associate)
+db.RankingVendedor.belongsTo(db.Vendedor, { foreignKey: 'vendedorId' });
+db.Vendedor.hasOne(db.RankingVendedor, { foreignKey: 'vendedorId' });
 
-DetallePedido.belongsTo(Producto, { foreignKey: 'productoId' });
-DetallePedido.belongsTo(Pedido, { foreignKey: 'pedidoId' });
+db.Producto.belongsTo(db.Vendedor, { foreignKey: 'vendedorId' });
+db.Vendedor.hasMany(db.Producto, { foreignKey: 'vendedorId' });
 
-Devolucion.belongsTo(Pedido, { foreignKey: 'pedidoId' });
-Pedido.hasMany(Devolucion, { foreignKey: 'pedidoId' });
+db.Vendedor.belongsTo(db.Usuario, { foreignKey: 'usuarioId' });
+db.Usuario.hasOne(db.Vendedor, { foreignKey: 'usuarioId' });
 
-Favorito.belongsTo(Producto, { foreignKey: 'productoId' });
+// ... y así sucesivamente para las otras asociaciones manuales.
+// Es mejor si estas están definidas dentro de los archivos de modelo correspondientes
+// en sus respectivos métodos `associate`.
+*/
 
-// ✅ Exportar modelos
+
+// ✅ Exportar modelos para que puedan ser importados con destructuring
 module.exports = {
-  sequelize,
-  Pedido,
-  Producto,
-  Resena,
-  Usuario,
-  InteraccionIA,
-  Entrega,
-  Vendedor,
-  DetallePedido,
-  Devolucion,
-  RankingVendedor,
-  HistorialProducto,
-  Favorito,
-  Mensaje,
+  sequelize: db.sequelize, // Exportar la instancia de sequelize
+  Sequelize: db.Sequelize, // Exportar la clase Sequelize
+  Pedido: db.Pedido,
+  Producto: db.Producto,
+  Resena: db.Resena,
+  Usuario: db.Usuario,
+  InteraccionIA: db.InteraccionIA,
+  Entrega: db.Entrega,
+  Vendedor: db.Vendedor,
+  DetallePedido: db.DetallePedido,
+  Devolucion: db.Devolucion,
+  RankingVendedor: db.RankingVendedor,
+  HistorialProducto: db.HistorialProducto,
+  Favorito: db.Favorito,
+  Mensaje: db.Mensaje,
+  Reporte: db.Reporte, // --- CAMBIO AQUÍ --- Exportar el modelo Reporte
 };
-

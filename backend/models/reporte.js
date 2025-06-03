@@ -1,8 +1,9 @@
-// 📁 backend/models/reporte.js
+//📁 backend/models/reporte.js
+
 module.exports = (sequelize, DataTypes) => {
   const Reporte = sequelize.define('Reporte', {
     tipo: {
-      type: DataTypes.STRING, // Ej: 'reseña', 'producto'
+      type: DataTypes.ENUM('producto', 'reseña', 'mensaje'),
       allowNull: false,
     },
     contenidoId: {
@@ -13,15 +14,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    descripcion: {
+      type: DataTypes.TEXT,
+    },
     estado: {
       type: DataTypes.ENUM('pendiente', 'resuelto'),
       defaultValue: 'pendiente',
-    },
-    reportadoPor: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
+    }
   });
+
+  Reporte.associate = models => {
+    Reporte.belongsTo(models.Usuario, { foreignKey: 'usuarioId' });
+  };
 
   return Reporte;
 };

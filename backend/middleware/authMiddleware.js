@@ -1,9 +1,11 @@
 // 📁 backend/middleware/authMiddleware.js
 
 const jwt = require('jsonwebtoken');
+const { Usuario } = require('../models');
 const secretKey = process.env.JWT_SECRET || 'clave_secreta';
 
-const verificarToken = (req, res, next) => {
+// Verifica que el token sea válido y recupera el usuario de la base de datos
+const verificarToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader?.split(' ')[1] || authHeader;
 
@@ -17,7 +19,14 @@ const verificarToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, secretKey);
     console.log("✅ Token decodificado:", decoded);
-    req.usuario = decoded;
+
+    // Buscar usuario real desde DB para mantener actualizado
+    const usuario = await Usuario.findByPk(decoded.id);
+    if (!usuario) {
+      return res.status(401).json({ mensaje: 'Usuario no encontrado.' });
+    }
+
+    req.usuario = usuario; // Pasa usuario completo a los controladores
     next();
   } catch (err) {
     console.error("❌ Error al verificar token:", err.message);
@@ -25,6 +34,7 @@ const verificarToken = (req, res, next) => {
   }
 };
 
+// Middleware para verificar que el usuario tenga el rol adecuado
 const verificarRol = (rolRequerido) => {
   return (req, res, next) => {
     const usuario = req.usuario;
@@ -35,6 +45,7 @@ const verificarRol = (rolRequerido) => {
   };
 };
 
+// Alternativa para múltiples roles permitidos
 const authMiddleware = (rolesPermitidos = []) => {
   return (req, res, next) => {
     const usuario = req.usuario;

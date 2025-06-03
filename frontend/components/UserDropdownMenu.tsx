@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { cerrarSesionGlobal } from '@/hooks/useCerrarSesion'; // 🔁 Hook global para cerrar sesión
 
 interface Props {
   avatar?: string;
@@ -11,6 +13,18 @@ interface Props {
 
 const UserDropdownMenu = ({ avatar, nombre = 'Usuario', logout }: Props) => {
   const router = useRouter();
+  const [usuario, setUsuario] = useState<{ nombreCompleto: string } | null>(null);
+
+  useEffect(() => {
+    const data = localStorage.getItem('usuario');
+    if (data) {
+      setUsuario(JSON.parse(data));
+    }
+  }, []);
+
+  const displayName = (usuario?.nombreCompleto && usuario.nombreCompleto.trim() !== '') 
+    ? usuario.nombreCompleto 
+    : (nombre?.trim() !== '' ? nombre : '');
 
   return (
     <div className="relative group">
@@ -23,10 +37,10 @@ const UserDropdownMenu = ({ avatar, nombre = 'Usuario', logout }: Props) => {
           />
         ) : (
           <div className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-white text-sm font-bold">
-            {nombre.charAt(0)}
+            {displayName ? displayName.charAt(0) : 'U'}
           </div>
         )}
-        <span className="text-sm font-medium whitespace-nowrap truncate max-w-[120px]">{nombre}</span>
+        <span className="text-sm font-medium whitespace-nowrap truncate max-w-[120px]">{displayName || 'Usuario'}</span>
         <svg
           className="w-4 h-4"
           fill="none"
@@ -57,16 +71,14 @@ const UserDropdownMenu = ({ avatar, nombre = 'Usuario', logout }: Props) => {
               </button>
             </Link>
           </li>
-          {logout && (
-            <li>
-              <button
-                onClick={logout}
-                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-              >
-                Cerrar sesión
-              </button>
-            </li>
-          )}
+          <li>
+            <button
+              onClick={logout || (() => cerrarSesionGlobal(router))}
+              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+            >
+              Cerrar sesión
+            </button>
+          </li>
         </ul>
       </div>
     </div>
