@@ -64,6 +64,9 @@ useEffect(() => {
 
 ## 📤 Prompt para herramientas como Codex o GitHub Copilot
 
-> Tengo un componente de dashboard de administrador en Next.js que entra en un loop infinito de renderizados o llamadas a fetch(). Uso `useEffect` con dependencias \[isAuthenticated, user, token]. Sospecho que isAuthenticated() cambia de referencia o que el token se remueve en un fetch fallido.
-
-> 🚫 Necesito ayuda para evitar que se dispare más de una vez si ya estoy autenticado como admin. ¿Cómo lo aíslo mejor?
+> I have an admin dashboard component in Next.js that falls into an **infinite loop of re-renders** or API calls.
+> I’m using `useEffect` with dependencies like `[isAuthenticated, user, token]`.
+> I suspect that `isAuthenticated()` is being redefined on every render or that the token is being removed due to a 401 error, which causes a recursive authentication loop.
+>
+> 🚫 I need help to **ensure this effect only runs once** when the user is authenticated as an admin.
+> What’s the best way to isolate this behavior and prevent unnecessary re-renders?
