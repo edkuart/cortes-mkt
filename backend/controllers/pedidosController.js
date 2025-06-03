@@ -183,19 +183,25 @@ const obtenerPedidosPorVendedor = async (req, res) => {
   try {
     const vendedorId = req.usuario.id;
 
+    // El modelo Pedido no tiene un campo vendedorId. Para obtener los pedidos
+    // relacionados al vendedor autenticado filtramos por los productos de cada
+    // detalle de pedido que pertenezcan a dicho vendedor.
     const pedidos = await Pedido.findAll({
-      where: { vendedorId },
       include: [
         {
           model: DetallePedido,
-          as: "detalles",
-          include: [Producto],
+          as: 'detalles',
+          include: [
+            {
+              model: Producto,
+              where: { vendedorId },
+            },
+          ],
         },
-        {
-          model: Entrega
-        }
+        { model: Entrega },
       ],
       order: [['createdAt', 'DESC']],
+      distinct: true,
     });
 
     res.json(pedidos);
