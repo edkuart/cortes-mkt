@@ -1,6 +1,6 @@
 // 📁 hooks/useAuth.ts
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface Usuario {
   id: number;
@@ -57,7 +57,7 @@ export const useAuth = () => {
     setAuth({ usuario: null, token: null });
   };
 
-  const isAuthenticated = () => !!auth.token;
+  const isAuthenticated = useCallback(() => !!auth.token, [auth.token]);
 
   return {
     user: auth.usuario,
